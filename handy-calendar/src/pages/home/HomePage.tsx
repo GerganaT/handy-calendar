@@ -1,5 +1,5 @@
 import CurrentNavigationPage from "@/navigation/CurrentNavigationPage";
-import NavigationDropdown from "@/navigation/NavigationnDropdown";
+import NavigationDropdown from "@/navigation/NavigationDropdown";
 
 const HomePage = () => {
   return (
