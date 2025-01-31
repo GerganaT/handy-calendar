@@ -11,6 +11,8 @@ const NavigationDropdown = () => {
     <CustomDropdownMenu
       menuItems={menuItems}
       defaultValue={currentRoute}
+      stylingClassMenuTrigger="text-2xl bg-blue-100 p-2 rounded-xl"
+      stylingClassMenuContent="text-2xl bg-blue-100 p-2 rounded-xl"
       onOptionClick={(optionClicked) => setCurrentRoute(optionClicked)}
     />
   );
