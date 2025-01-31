@@ -4,8 +4,10 @@ import NavigationDropdown from "@/navigation/NavigationDropdown";
 const HomePage = () => {
   return (
     <>
-      <NavigationDropdown />
-      <CurrentNavigationPage />
+      <div className="flex flex-col items-center m-8">
+        <NavigationDropdown />
+        <CurrentNavigationPage />
+      </div>
     </>
   );
 };
