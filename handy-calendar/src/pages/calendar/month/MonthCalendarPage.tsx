@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import {
   DateDetails,
+  FIRST_DAY_OF_THE_MONTH,
   getMonthDates,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
@@ -34,7 +35,11 @@ const DateElement = ({ details, cellIndex }: DateHeaderProps) => {
       {cellIndex < WEEK_DAYS_COUNT && (
         <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
       )}
-      <h1 className="font-normal">{details.date}</h1>
+      <h1 className="font-normal">
+        {details.date === `${FIRST_DAY_OF_THE_MONTH}`
+          ? `${details.month} ${details.date}`
+          : details.date}
+      </h1>
     </div>
   );
 };
