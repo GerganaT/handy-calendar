@@ -1,5 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMonthNavigationStore } from "@/navigation/store/monthNavigationStore";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DateDetails,
   FIRST_DAY_OF_THE_MONTH,
@@ -8,17 +9,38 @@ import {
   WEEK_DAYS_COUNT,
 } from "../utils/dateTimeUtils";
 
+const LOADING_DURATION_IN_SECONDS = 1000;
 const MonthCalendarPage = () => {
   const { currentDate } = useMonthNavigationStore();
   const totalDays = useMemo(() => getMonthDates(currentDate), [currentDate]);
 
+  useEffect(() => showLoadingSkeleton(), [currentDate]);
+
+  const [shouldShowLoadingSkeleton, setShouldShowLoadingSkeleton] =
+    useState(true);
+
+  const showLoadingSkeleton = () => {
+    setShouldShowLoadingSkeleton(true);
+    setTimeout(() => {
+      setShouldShowLoadingSkeleton(false);
+    }, LOADING_DURATION_IN_SECONDS);
+  };
+
   return (
     <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
       <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
-        {totalDays.length > 0 &&
-          totalDays.map((dateDetails, index) => (
-            <DateElement details={dateDetails} cellIndex={index} key={index} />
-          ))}
+        {shouldShowLoadingSkeleton
+          ? Array.from({ length: 42 }).map((_, index) => (
+              <DateElementSkeleton key={index} />
+            ))
+          : totalDays.length > 0 &&
+            totalDays.map((dateDetails, index) => (
+              <DateElement
+                details={dateDetails}
+                cellIndex={index}
+                key={index}
+              />
+            ))}
       </div>
     </div>
   );
@@ -45,3 +67,13 @@ const DateElement = ({ details, cellIndex }: DateHeaderProps) => {
     </div>
   );
 };
+
+const DateElementSkeleton = () => (
+  <div className="flex items-center flex-col py-2 border bg-white">
+    <Skeleton className="w-1/4 h-6 mb-1" />
+    <Skeleton className="w-1/12 h-6 mb-4" />
+    <Skeleton className="w-1/2 h-4 mb-1" />
+    <Skeleton className="w-1/2 h-4 mb-1" />
+    <Skeleton className="w-1/2 h-4" />
+  </div>
+);
