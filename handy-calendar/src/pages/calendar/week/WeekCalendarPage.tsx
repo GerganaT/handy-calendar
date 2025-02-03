@@ -22,7 +22,7 @@ const WeekCalendarPage = () => {
     </div>
   );
 };
-//TODO: surround today's date with circle
+
 export default WeekCalendarPage;
 
 const HoursIndicator = () => (
