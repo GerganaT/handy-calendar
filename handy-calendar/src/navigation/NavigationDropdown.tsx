@@ -1,7 +1,7 @@
 import CustomDropdownMenu from "@/components/ui/dropdown/CustomDropdownMenu";
 
 import Routes from "./Routes";
-import useNavigationStore from "./store";
+import useNavigationStore from "./store/pageNavigationStore";
 
 const NavigationDropdown = () => {
   const menuItems = Object.keys(Routes);
@@ -11,8 +11,8 @@ const NavigationDropdown = () => {
     <CustomDropdownMenu
       menuItems={menuItems}
       defaultValue={currentRoute}
-      stylingClassMenuTrigger="text-2xl bg-blue-100 p-2 rounded-xl"
-      stylingClassMenuContent="text-2xl bg-blue-100 p-2 rounded-xl"
+      stylingClassMenuTrigger=" text-sm sm:text-2xl bg-blue-100 p-2 rounded-xl w-30"
+      stylingClassMenuContent=" text-sm sm:text-2xl bg-blue-100 p-2 rounded-xl w-30"
       onOptionClick={(optionClicked) => setCurrentRoute(optionClicked)}
     />
   );
