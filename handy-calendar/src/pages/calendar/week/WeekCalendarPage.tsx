@@ -1,6 +1,9 @@
+import { useMemo } from "react";
 import {
   formatHourInTwelveHourFormat,
+  FULL_DAY_NIGHT_HOURS,
   getWeekDates,
+  WEEK_DAYS_COUNT,
 } from "../utils/dateTimeUtils";
 
 const WeekCalendarPage = () => {
@@ -19,12 +22,12 @@ const WeekCalendarPage = () => {
     </div>
   );
 };
-
+//TODO: surround today's date with circle
 export default WeekCalendarPage;
 
 const HoursIndicator = () => (
   <div className="grid grid-rows-24 w-16">
-    {Array.from({ length: 24 }).map((_, hour) => (
+    {Array.from({ length: FULL_DAY_NIGHT_HOURS }).map((_, hour) => (
       <div
         key={hour}
         className="flex items-center justify-end pr-2 font-medium text-sm text-gray-600  h-10"
@@ -35,24 +38,30 @@ const HoursIndicator = () => (
   </div>
 );
 
-const WeekDatesHeader = () => (
-  <div className="grid grid-cols-7 text-center bg-blue-100">
-    {getWeekDates().map(({ day, date }, index) => (
-      <div
-        key={index}
-        className="flex flex-col text-sm sm:text-base md:text-lg lg:text-xl  pb-2"
-      >
-        <span className="font-medium">{day}</span>
-        <span className="font-bold">{date}</span>
-      </div>
-    ))}
-  </div>
-);
+const WeekDatesHeader = () => {
+  const weekDates = useMemo(() => getWeekDates(), []);
+  return (
+    <div className="grid grid-cols-7 text-center bg-blue-100">
+      {weekDates.length > 0 &&
+        weekDates.map(({ day, date }, index) => (
+          <div
+            key={index}
+            className="flex flex-col text-sm sm:text-base md:text-lg lg:text-xl  pb-2"
+          >
+            <span className="font-medium">{day}</span>
+            <span className="font-bold">{date}</span>
+          </div>
+        ))}
+    </div>
+  );
+};
 
 const WeekdaysAgenda = () => (
   <div className="grid grid-cols-7 grid-rows-24 w-full bg-white rounded-xl">
-    {Array.from({ length: 7 * 24 }).map((_, index) => (
-      <div key={index} className="border border-gray-300 min-h-10"></div>
-    ))}
+    {Array.from({ length: WEEK_DAYS_COUNT * FULL_DAY_NIGHT_HOURS }).map(
+      (_, index) => (
+        <div key={index} className="border border-gray-300 min-h-10"></div>
+      )
+    )}
   </div>
 );

@@ -1,17 +1,40 @@
+import { useMemo } from "react";
+import {
+  DateDetails,
+  getMonthDates,
+  WEEK_DAYS,
+  WEEK_DAYS_COUNT,
+} from "../utils/dateTimeUtils";
+
 const MonthCalendarPage = () => {
+  const totalDays = useMemo(() => getMonthDates(), []);
+
   return (
-    <>
-      <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
-        <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
-          {Array.from({ length: 31 }).map((_, index) => (
-            <div key={index} className="border p-2 bg-white">
-              {index + 1}
-            </div>
+    <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
+      <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
+        {totalDays.length > 0 &&
+          totalDays.map((dateDetails, index) => (
+            <DateElement details={dateDetails} cellIndex={index} key={index} />
           ))}
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default MonthCalendarPage;
+
+interface DateHeaderProps {
+  details: DateDetails;
+  cellIndex: number;
+}
+
+const DateElement = ({ details, cellIndex }: DateHeaderProps) => {
+  return (
+    <div className="flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border bg-white">
+      {cellIndex < WEEK_DAYS_COUNT && (
+        <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
+      )}
+      <h1 className="font-normal">{details.date}</h1>
+    </div>
+  );
+};
