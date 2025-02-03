@@ -31,10 +31,10 @@ export  const getWeekDates = (): DateDetails[] => {
     return week;
   };
 
-  export const getMonthDates = (): DateDetails[] => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
+  export const getMonthDates = (selectedDate:Date): DateDetails[] => {
+   
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const lastDayOfMonth = new Date(year, month, daysInMonth).getDay();
@@ -50,7 +50,7 @@ export  const getWeekDates = (): DateDetails[] => {
       const formattedDate = formatDate(i);
       currentMonthDates.push({ day,
          date: formattedDate,
-        month: getCurrentMonthText(),
+        month: getCurrentMonthText(selectedDate),
        });
     }
   
@@ -60,7 +60,7 @@ for (let i = firstDayOfMonth - 1; i >= 0; i--) {
   const date = prevMonthLastDay - (firstDayOfMonth - 1 - i);
   prevMonthDates.push({ day,
      date: formatDate(date),
-     month: getPreviousMonthText(),
+     month: getPreviousMonthText(selectedDate),
      });
 }
 
@@ -71,7 +71,7 @@ for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       const day = WEEK_DAYS[(lastDayOfMonth + i) % WEEK_DAYS_COUNT];
       nextMonthDates.push({ day,
          date: formatDate(i),
-         month: getNextMonthText(),
+         month: getNextMonthText(selectedDate),
          });
     }
 
@@ -91,19 +91,19 @@ for (let i = firstDayOfMonth - 1; i >= 0; i--) {
 
   const formatDate = (date: number) => date.toString();  
   
-  function getNextMonthText(){
-    const prevDate = new Date();
+  function getNextMonthText(selectedDate: Date){
+    const prevDate = new Date(selectedDate);
     prevDate.setMonth(prevDate.getMonth() + 1);
     return  prevDate.toLocaleString('en-US', { month: 'short' });
   }
 
-  function getPreviousMonthText(){
-    const prevDate = new Date();
+  function getPreviousMonthText(selectedDate: Date){
+    const prevDate = new Date(selectedDate);
     prevDate.setMonth(prevDate.getMonth() - 1);
     return  prevDate.toLocaleString('en-US', { month: 'short' });
   }
 
-  function getCurrentMonthText(){
-    return new Date().toLocaleString('en-US', { month: 'short' });
+  function getCurrentMonthText(selectedDate: Date){
+    return new Date(selectedDate).toLocaleString('en-US', { month: 'short' });
   }
     

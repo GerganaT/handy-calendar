@@ -1,3 +1,4 @@
+import { useMonthNavigationStore } from "@/navigation/store/monthNavigationStore";
 import { useMemo } from "react";
 import {
   DateDetails,
@@ -8,7 +9,8 @@ import {
 } from "../utils/dateTimeUtils";
 
 const MonthCalendarPage = () => {
-  const totalDays = useMemo(() => getMonthDates(), []);
+  const { currentDate } = useMonthNavigationStore();
+  const totalDays = useMemo(() => getMonthDates(currentDate), [currentDate]);
 
   return (
     <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
