@@ -8,8 +8,8 @@ import { EVENT_DEFAULT_ID } from "./constants";
 export const saveEvent = async (event:EventApiState) => {
             const storedObject = {
               ...event,
-              startEvent: event.startEvent.getMilliseconds(),
-              endEvent: event.endEvent.getMilliseconds(),
+              startEvent: event.startEvent.getTime(),
+              endEvent: event.endEvent.getTime(),
             }; 
             apiClient.setItem(`${event.id}`, JSON.stringify(storedObject));
             return true;

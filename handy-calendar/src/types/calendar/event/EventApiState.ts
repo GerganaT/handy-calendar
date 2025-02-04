@@ -1,7 +1,7 @@
 interface EventApiState{
     id: number;
     title: string;
-    description: string;
+    description?: string;
     startEvent: Date;
     endEvent: Date;
     type: EventType;

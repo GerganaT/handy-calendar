@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMonthNavigationStore } from "@/navigation/store/monthNavigationStore";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DateDetails,
   FIRST_DAY_OF_THE_MONTH,
@@ -12,9 +12,6 @@ import {
 const LOADING_DURATION_IN_SECONDS = 1000;
 const MonthCalendarPage = () => {
   const { currentDate } = useMonthNavigationStore();
-  const totalDays = useMemo(() => getMonthDates(currentDate), [currentDate]);
-
-  useEffect(() => showLoadingSkeleton(), [currentDate]);
 
   const [shouldShowLoadingSkeleton, setShouldShowLoadingSkeleton] =
     useState(true);
@@ -25,6 +22,11 @@ const MonthCalendarPage = () => {
       setShouldShowLoadingSkeleton(false);
     }, LOADING_DURATION_IN_SECONDS);
   };
+
+  const totalDays = useMemo(() => {
+    showLoadingSkeleton();
+    return getMonthDates(currentDate);
+  }, [currentDate]);
 
   return (
     <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">

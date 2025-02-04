@@ -1,3 +1,4 @@
+import { EVENT_DEFAULT_ID } from "../constants";
 import {
   useDeleteEvent,
   useGetEvent,
@@ -6,10 +7,10 @@ import {
 } from "../eventService";
 
 interface UseEventsProps {
-  eventId: number;
+  eventId?: number;
 }
 
-const useEvents = ({ eventId }: UseEventsProps) => {
+const useEvents = ({ eventId = EVENT_DEFAULT_ID }: UseEventsProps = {}) => {
   const { data: event, error: eventError } = useGetEvent(eventId);
   const {
     data: events,
