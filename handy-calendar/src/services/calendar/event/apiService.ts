@@ -21,8 +21,9 @@ export const deleteEvent = async (eventId: number) => {
 };
 
 export const getEvent = (eventId: number) => {
-        const storedItem = apiClient.getItem(`${eventId}`);
-        return storedItem ? (JSON.parse(storedItem) as EventApiState) : null;
+        const storedEvent = apiClient.getItem(`${eventId}`);
+        const parsedEvent = storedEvent ? JSON.parse(storedEvent) as EventApiState : null;
+        return parsedEvent ? {...parsedEvent, startEvent: new Date(parsedEvent.startEvent), endEvent: new Date(parsedEvent.endEvent)} as EventApiState : null;
 };
 
 export const getEvents = () => {
@@ -30,7 +31,8 @@ export const getEvents = () => {
     for (let index = 0; index < apiClient.length; index++) {
         const storedEvent = apiClient.getItem(apiClient.key(index) ?? `${EVENT_DEFAULT_ID}`);
         if(storedEvent){
-            storedEvents.push(JSON.parse(storedEvent) as EventApiState);
+            const parsedEvent = JSON.parse(storedEvent) as EventApiState
+            storedEvents.push({...parsedEvent, startEvent: new Date(parsedEvent.startEvent), endEvent: new Date(parsedEvent.endEvent)});
         }
     }
     return storedEvents;

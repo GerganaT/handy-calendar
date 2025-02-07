@@ -6,8 +6,8 @@ import { EVENTS_DATA_KEY } from "./constants";
 
 export const useSaveEvent = () => {
   const queryClient = useQueryClient();
-  return useMutation<boolean, Error, EventApiState>({
-    mutationFn: (event: EventApiState) => saveEvent(event),
+  return useMutation<boolean, Error, EventUiState>({
+    mutationFn: (event: EventUiState) => saveEvent({ ...event }),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: EVENTS_DATA_KEY,

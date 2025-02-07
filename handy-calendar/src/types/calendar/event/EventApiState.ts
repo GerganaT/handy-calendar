@@ -1,3 +1,4 @@
+
 interface EventApiState{
     id: number;
     title: string;
@@ -7,10 +8,10 @@ interface EventApiState{
     type: EventType;
 }
 
+export default EventApiState;
+
 enum EventType {
     Birthday = "GREEN",
     Meeting = "BLUE",
     Task = "ORANGE",
 }
-
-export default EventApiState;

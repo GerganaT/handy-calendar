@@ -1,71 +1,123 @@
+import ErrorAlert from "@/components/ui/ErrorAlert";
+import EventDetailsDialog from "@/components/ui/event/EventDetailsDialog";
+import EventHolder from "@/components/ui/event/EventHolder";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMonthNavigationStore } from "@/navigation/store/monthNavigationStore";
+import { useGetEvents } from "@/services/calendar/event/eventService";
+import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
+import EventUiState from "@/types/calendar/event/EventUiState";
 import { useMemo, useState } from "react";
 import {
-  DateDetails,
   FIRST_DAY_OF_THE_MONTH,
+  formatDate,
   getMonthDates,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
-} from "../utils/dateTimeUtils";
+} from "../utils/calendarUtils";
+import { useTriggerLoadingSkeleton } from "../utils/helperHooks";
 
-const LOADING_DURATION_IN_SECONDS = 1000;
+const CALENDAR_GRID_LENGTH = 42;
+
 const MonthCalendarPage = () => {
   const { currentDate } = useMonthNavigationStore();
 
-  const [shouldShowLoadingSkeleton, setShouldShowLoadingSkeleton] =
-    useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<EventUiState>();
 
-  const showLoadingSkeleton = () => {
-    setShouldShowLoadingSkeleton(true);
-    setTimeout(() => {
-      setShouldShowLoadingSkeleton(false);
-    }, LOADING_DURATION_IN_SECONDS);
-  };
+  const { shouldShowLoadingSkeleton, showLoadingSkeleton } =
+    useTriggerLoadingSkeleton();
+
+  const { data: events, error } = useGetEvents();
 
   const totalDays = useMemo(() => {
     showLoadingSkeleton();
-    return getMonthDates(currentDate);
-  }, [currentDate]);
+
+    let daysWithEvents = getMonthDates(currentDate);
+    if (events && events.length > 0) {
+      daysWithEvents = daysWithEvents.map(
+        (entry) =>
+          ({
+            ...entry,
+            events: events?.filter((event) => {
+              const startEvent = event.startEvent;
+              return (
+                WEEK_DAYS[startEvent.getDay()] === entry.day &&
+                formatDate(startEvent.getDate()) === entry.date &&
+                startEvent.getFullYear() === entry.year &&
+                startEvent.toLocaleString("en-US", { month: "short" }) ===
+                  entry.month
+              );
+            }),
+          } as CalendarEntryUiState)
+      );
+    }
+
+    return daysWithEvents;
+  }, [currentDate, events]);
 
   return (
-    <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
-      <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
-        {shouldShowLoadingSkeleton
-          ? Array.from({ length: 42 }).map((_, index) => (
-              <DateElementSkeleton key={index} />
-            ))
-          : totalDays.length > 0 &&
-            totalDays.map((dateDetails, index) => (
-              <DateElement
-                details={dateDetails}
-                cellIndex={index}
-                key={index}
-              />
-            ))}
+    <>
+      {error && <ErrorAlert error={error} />}
+      <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
+        <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
+          {shouldShowLoadingSkeleton
+            ? Array.from({ length: CALENDAR_GRID_LENGTH }).map((_, index) => (
+                <DateElementSkeleton key={index} />
+              ))
+            : totalDays.length > 0 &&
+              totalDays.map((calendarEntry, index) => (
+                <CalendarEntryElement
+                  entry={calendarEntry}
+                  cellIndex={index}
+                  key={index}
+                  provideEvent={(eventEntry) =>
+                    setSelectedEvent({ ...eventEntry })
+                  }
+                />
+              ))}
+        </div>
+        {selectedEvent && (
+          <EventDetailsDialog
+            selectedEvent={selectedEvent}
+            onDialogDismiss={() => setSelectedEvent(undefined)}
+            onEventDeleted={() => setSelectedEvent(undefined)}
+          />
+        )}
       </div>
-    </div>
+    </>
   );
 };
 
 export default MonthCalendarPage;
 
-interface DateHeaderProps {
-  details: DateDetails;
+interface CalendarEntryProps {
+  entry: CalendarEntryUiState;
   cellIndex: number;
+  provideEvent: (eventEntry: EventUiState) => void;
 }
 
-const DateElement = ({ details, cellIndex }: DateHeaderProps) => {
+const CalendarEntryElement = ({
+  entry,
+  cellIndex,
+  provideEvent,
+}: CalendarEntryProps) => {
   return (
     <div className="flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border bg-white">
       {cellIndex < WEEK_DAYS_COUNT && (
         <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
       )}
       <h1 className="font-normal">
-        {details.date === `${FIRST_DAY_OF_THE_MONTH}`
-          ? `${details.month} ${details.date}`
-          : details.date}
+        {entry.date === `${FIRST_DAY_OF_THE_MONTH}`
+          ? `${entry.month} ${entry.date}`
+          : entry.date}
       </h1>
+      {entry.events.length > 0 &&
+        entry.events.map((eventEntry) => (
+          <EventHolder
+            onClick={() => provideEvent(eventEntry)}
+            key={eventEntry.id}
+            event={eventEntry}
+          />
+        ))}
     </div>
   );
 };

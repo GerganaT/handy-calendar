@@ -4,7 +4,7 @@ import {
   FULL_DAY_NIGHT_HOURS,
   getWeekDates,
   WEEK_DAYS_COUNT,
-} from "../utils/dateTimeUtils";
+} from "../utils/calendarUtils";
 
 const WeekCalendarPage = () => {
   return (

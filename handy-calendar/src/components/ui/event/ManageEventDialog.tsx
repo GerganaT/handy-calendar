@@ -23,50 +23,66 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import useEvents from "@/services/calendar/event/hooks/useEvents";
-import { EventType } from "@/types/calendar/event/EventUiState";
+import { useSaveEvent } from "@/services/calendar/event/eventService";
+
+import EventUiState, { EventType } from "@/types/calendar/event/EventUiState";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { format } from "date-fns";
+import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { createEventId } from "./utils";
 
-const eventSchema = z
-  .object({
-    title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
-    startEvent: z.string().min(1, "Start time is required"),
-    endEvent: z.string().min(1, "End time is required"),
-    type: z.nativeEnum(EventType, {
-      errorMap: () => ({ message: "Please select an event type" }),
-    }),
-  })
-  .refine((data) => new Date(data.endEvent) > new Date(data.startEvent), {
-    message: "End date must be later than start date",
-    path: ["endEvent"],
-  });
+interface ManageEventDialogProps {
+  children: ReactNode;
+  event?: EventUiState;
+  onDialogDismiss?: () => void;
+}
 
-type EventFormValues = z.infer<typeof eventSchema>;
-
-export default function CreateEventFAB() {
+const ManageEventDialog = ({
+  children,
+  event,
+  onDialogDismiss = () => {},
+}: ManageEventDialogProps) => {
   const [open, setOpen] = useState(false);
-  const { saveEvent } = useEvents();
+  const { mutate: saveEvent, error } = useSaveEvent();
   const { toast } = useToast();
+
+  const eventSchema = z
+    .object({
+      title: z.string().min(1, "Title is required"),
+      description: z.string().optional(),
+      startEvent: z.string().min(1, "Start time is required"),
+      endEvent: z.string().min(1, "End time is required"),
+      type: z.nativeEnum(EventType, {
+        errorMap: () => ({ message: "Please select an event type" }),
+      }),
+    })
+    .refine((data) => new Date(data.endEvent) > new Date(data.startEvent), {
+      message: "End date must be later than start date",
+      path: ["endEvent"],
+    });
+
+  const formatEventDateForDatePicker = (eventDate: Date) =>
+    format(eventDate, "yyyy-MM-dd'T'HH:mm");
+
+  type EventFormValues = z.infer<typeof eventSchema>;
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
+    mode: "onChange",
+    reValidateMode: "onBlur",
     defaultValues: {
-      title: "",
-      description: "",
-      startEvent: "",
-      endEvent: "",
-      type: undefined,
+      title: event?.title || "",
+      description: event?.description || "",
+      startEvent: event ? formatEventDateForDatePicker(event.startEvent) : "",
+      endEvent: event ? formatEventDateForDatePicker(event.endEvent) : "",
+      type: event?.type,
     },
   });
 
   function onSubmit(values: EventFormValues) {
     saveEvent({
-      id: createEventId(), //TODO: call other function if id does exist
+      id: event?.id || createEventId(),
       title: values.title,
       description: values.description,
       startEvent: new Date(values.startEvent),
@@ -75,31 +91,39 @@ export default function CreateEventFAB() {
     });
 
     toast({
-      title: `${values.title} saved!`,
+      description: ` ${error?.message ?? `Event "${values.title}" saved!`}`,
     });
 
     form.reset();
+    onDialogDismiss();
     setOpen(false);
+  }
+
+  function createEventId() {
+    return new Date().getTime();
   }
 
   return (
     <>
-      {/* Floating Action Button */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            onClick={() => form.reset()}
-            className="fixed bottom-5 right-5 sm:bottom-10 sm:right-10 bg-blue-400 hover:bg-blue-600 text-black text-sm sm:text-lg m-6 rounded-full shadow-lg sm:scale-150"
-          >
-            Create Event
-          </Button>
-        </DialogTrigger>
+      <Dialog
+        open={open}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            form.reset();
+            onDialogDismiss();
+          }
+          setOpen(isOpen);
+        }}
+      >
+        <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent
           className="bg-blue-100 p-6"
           aria-describedby="dialog-description"
         >
           <DialogHeader>
-            <DialogTitle>Create New Event</DialogTitle>
+            <DialogTitle>
+              {event ? "Edit Event" : "Create New Event"}
+            </DialogTitle>
           </DialogHeader>
           <p id="dialog-description" className="sr-only">
             Fill out the details below to create a new event.
@@ -216,4 +240,6 @@ export default function CreateEventFAB() {
       </Dialog>
     </>
   );
-}
+};
+
+export default ManageEventDialog;

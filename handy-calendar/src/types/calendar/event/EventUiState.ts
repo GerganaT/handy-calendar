@@ -1,3 +1,4 @@
+
 interface EventUiState{
     id: number;
     title: string;
@@ -7,10 +8,10 @@ interface EventUiState{
     type: EventType;
 }
 
+export default EventUiState;
+
 export enum EventType {
     Birthday = "GREEN",
     Meeting = "BLUE",
     Task = "ORANGE",
 }
-
-export default EventUiState;

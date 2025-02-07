@@ -3,7 +3,7 @@ import {
   formatHourInTwelveHourFormat,
   FULL_DAY_NIGHT_HOURS,
   getTodayDateDetails,
-} from "../utils/dateTimeUtils";
+} from "../utils/calendarUtils";
 
 const DayCalendarPage = () => {
   return (
