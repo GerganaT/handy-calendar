@@ -3,7 +3,7 @@ import ManageEventDialog from "@/components/ui/event/ManageEventDialog";
 import { Toaster } from "@/components/ui/toaster";
 import CurrentNavigationPage from "@/navigation/CurrentNavigationPage";
 import NavigationDropdown from "@/navigation/NavigationDropdown";
-import MonthNavigator from "../../navigation/MonthNavigator";
+import CalendarNavigator from "../../navigation/CalendarNavigator";
 
 const HomePage = () => {
   return (
@@ -17,7 +17,7 @@ const HomePage = () => {
       </ManageEventDialog>
       <div className="flex flex-col items-center m-8">
         <div className="flex flex-row p-2">
-          <MonthNavigator />
+          <CalendarNavigator />
           <NavigationDropdown />
         </div>
         <CurrentNavigationPage />

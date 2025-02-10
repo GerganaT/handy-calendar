@@ -2,7 +2,7 @@ import ErrorAlert from "@/components/ui/ErrorAlert";
 import EventDetailsDialog from "@/components/ui/event/EventDetailsDialog";
 import EventHolder from "@/components/ui/event/EventHolder";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMonthNavigationStore } from "@/navigation/store/monthNavigationStore";
+import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
@@ -19,7 +19,7 @@ import { useTriggerLoadingSkeleton } from "../utils/helperHooks";
 const CALENDAR_GRID_LENGTH = 42;
 
 const MonthCalendarPage = () => {
-  const { currentDate } = useMonthNavigationStore();
+  const { currentDate } = useCalendarNavigationStore();
 
   const [selectedEvent, setSelectedEvent] = useState<EventUiState>();
 
