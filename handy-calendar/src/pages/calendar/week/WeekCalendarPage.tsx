@@ -1,5 +1,5 @@
 import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   formatHourInTwelveHourFormat,
   FULL_DAY_NIGHT_HOURS,
@@ -40,8 +40,14 @@ const HoursIndicator = () => (
 );
 
 const WeekDatesHeader = () => {
-  const { currentDate } = useCalendarNavigationStore();
-  const weekDates = useMemo(() => getWeekDates(currentDate), [currentDate]);
+  const { currentDate, initializeWeeklyDate } = useCalendarNavigationStore();
+
+  useEffect(() => initializeWeeklyDate(), []);
+
+  const weekDates = useMemo(() => {
+    return getWeekDates(currentDate);
+  }, [currentDate]);
+
   return (
     <div className="grid grid-cols-7 text-center bg-blue-100">
       {weekDates.length > 0 &&
