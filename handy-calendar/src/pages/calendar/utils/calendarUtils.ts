@@ -12,15 +12,16 @@ export const getTodayDateDetails = ():CalendarEntryUiState => {
     return { day, date: formattedDate,events: [] };
   };
 
-export const getWeekDates = (): CalendarEntryUiState[] => {
-    const today = new Date();
-    const startOfWeek = today.getDate() - today.getDay();
+export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
+    const selectedDate = new Date(date);
+    const startOfWeek = selectedDate.getDate() - selectedDate.getDay();
     const week: CalendarEntryUiState[] = [];
   
     for (let i = 0; i < WEEK_DAYS_COUNT; i++) {
-      const date = new Date(today.setDate(startOfWeek + i));
+      const weekDate = new Date(selectedDate);
+      weekDate.setDate(startOfWeek + i);
       const day = WEEK_DAYS[i];
-      const formattedDate = formatDate(date.getDate());
+      const formattedDate = formatDate(weekDate.getDate());
       week.push({ day, date: formattedDate, events: [] });
     }
     return week;

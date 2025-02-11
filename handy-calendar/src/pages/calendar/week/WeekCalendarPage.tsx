@@ -1,3 +1,4 @@
+import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
 import { useMemo } from "react";
 import {
   formatHourInTwelveHourFormat,
@@ -39,14 +40,15 @@ const HoursIndicator = () => (
 );
 
 const WeekDatesHeader = () => {
-  const weekDates = useMemo(() => getWeekDates(), []);
+  const { currentDate } = useCalendarNavigationStore();
+  const weekDates = useMemo(() => getWeekDates(currentDate), [currentDate]);
   return (
     <div className="grid grid-cols-7 text-center bg-blue-100">
       {weekDates.length > 0 &&
         weekDates.map(({ day, date }, index) => (
           <div
             key={index}
-            className="flex flex-col text-sm sm:text-base md:text-lg lg:text-xl  pb-2"
+            className="flex flex-col text-sm sm:text-base md:text-lg lg:text-xl pb-2"
           >
             <span className="font-medium">{day}</span>
             <span className="font-bold">{date}</span>
