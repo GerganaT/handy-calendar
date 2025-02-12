@@ -22,8 +22,13 @@ export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
       weekDate.setDate(startOfWeek + i);
       const day = WEEK_DAYS[i];
       const formattedDate = formatDate(weekDate.getDate());
-      week.push({ day, date: formattedDate, events: [] });
+      week.push({ day, date: formattedDate,
+         month: getCurrentMonthText(weekDate),
+         year: weekDate.getFullYear(),
+         events: [],
+         });
     }
+   
     return week;
   };
 
@@ -172,4 +177,14 @@ export const formattedLongDate = (date:Date) => {
   
   return date.toLocaleString("en-US", options);
 }
-    
+
+export function isEventInCalendarEntry(
+  startEvent: Date,
+  entry: CalendarEntryUiState,
+  ) {
+ return WEEK_DAYS[startEvent.getDay()] === entry.day &&
+  formatDate(startEvent.getDate()) === entry.date &&
+  startEvent.getFullYear() === entry.year &&
+  startEvent.toLocaleString("en-US", { month: "short" }) ===
+    entry.month
+}

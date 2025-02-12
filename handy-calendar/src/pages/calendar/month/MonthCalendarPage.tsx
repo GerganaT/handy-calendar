@@ -9,8 +9,8 @@ import EventUiState from "@/types/calendar/event/EventUiState";
 import { useMemo, useState } from "react";
 import {
   FIRST_DAY_OF_THE_MONTH,
-  formatDate,
   getMonthDates,
+  isEventInCalendarEntry,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
 } from "../utils/calendarUtils";
@@ -39,13 +39,7 @@ const MonthCalendarPage = () => {
             ...entry,
             events: events?.filter((event) => {
               const startEvent = event.startEvent;
-              return (
-                WEEK_DAYS[startEvent.getDay()] === entry.day &&
-                formatDate(startEvent.getDate()) === entry.date &&
-                startEvent.getFullYear() === entry.year &&
-                startEvent.toLocaleString("en-US", { month: "short" }) ===
-                  entry.month
-              );
+              return isEventInCalendarEntry(startEvent, entry);
             }),
           } as CalendarEntryUiState)
       );
