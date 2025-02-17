@@ -6,11 +6,13 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
+import { isSameDay } from "date-fns";
 import { useMemo, useState } from "react";
 import {
   FIRST_DAY_OF_THE_MONTH,
+  getDateFromCalendarEntry,
   getMonthDates,
-  isEventInCalendarEntry,
+  isEventStartInCalendarEntry,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
 } from "../utils/calendarUtils";
@@ -28,7 +30,7 @@ const MonthCalendarPage = () => {
 
   const { data: events, error } = useGetEvents();
 
-  const totalDays = useMemo(() => {
+  const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
 
     let daysWithEvents = getMonthDates(currentDate);
@@ -39,7 +41,7 @@ const MonthCalendarPage = () => {
             ...entry,
             events: events?.filter((event) => {
               const startEvent = event.startEvent;
-              return isEventInCalendarEntry(startEvent, entry);
+              return isEventStartInCalendarEntry(startEvent, entry);
             }),
           } as CalendarEntryUiState)
       );
@@ -52,13 +54,13 @@ const MonthCalendarPage = () => {
     <>
       {error && <ErrorAlert error={error} />}
       <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
-        <div className="grid grid-cols-7 overflow-clip h-full rounded-xl">
+        <div className="grid grid-cols-7 overflow-clip h-full rounded-xl ">
           {shouldShowLoadingSkeleton
             ? Array.from({ length: CALENDAR_GRID_LENGTH }).map((_, index) => (
                 <DateElementSkeleton key={index} />
               ))
-            : totalDays.length > 0 &&
-              totalDays.map((calendarEntry, index) => (
+            : totalDaysWithEvents.length > 0 &&
+              totalDaysWithEvents.map((calendarEntry, index) => (
                 <CalendarEntryElement
                   entry={calendarEntry}
                   cellIndex={index}
@@ -95,7 +97,13 @@ const CalendarEntryElement = ({
   provideEvent,
 }: CalendarEntryProps) => {
   return (
-    <div className="flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border bg-white">
+    <div
+      className={`flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border ${
+        isSameDay(getDateFromCalendarEntry(entry), new Date())
+          ? "bg-blue-400  text-white"
+          : "bg-white"
+      } `}
+    >
       {cellIndex < WEEK_DAYS_COUNT && (
         <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
       )}

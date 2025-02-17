@@ -10,7 +10,7 @@ const HomePage = () => {
     <>
       <ManageEventDialog>
         <Button
-          className={`fixed bottom-5 right-5 sm:bottom-10 sm:right-10 bg-blue-400 hover:bg-blue-600 text-black text-sm sm:text-lg m-6 rounded-full shadow-lg sm:scale-150`}
+          className={`fixed bottom-5 right-5 sm:bottom-10 sm:right-10 bg-blue-400 hover:bg-blue-600 text-black text-sm sm:text-lg m-6 rounded-full shadow-lg sm:scale-150 z-50`}
         >
           Create Event
         </Button>

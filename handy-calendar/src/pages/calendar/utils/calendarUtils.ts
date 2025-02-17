@@ -1,9 +1,11 @@
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
+import { parse } from "date-fns";
 
 export const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const WEEK_DAYS_COUNT = 7;
 export const FULL_DAY_NIGHT_HOURS = 24;
 export const FIRST_DAY_OF_THE_MONTH = 1;
+export const MINUTES_IN_AN_HOUR = 60;
 
 export const getTodayDateDetails = ():CalendarEntryUiState => {
     const today = new Date();
@@ -178,7 +180,7 @@ export const formattedLongDate = (date:Date) => {
   return date.toLocaleString("en-US", options);
 }
 
-export function isEventInCalendarEntry(
+export function isEventStartInCalendarEntry(
   startEvent: Date,
   entry: CalendarEntryUiState,
   ) {
@@ -187,4 +189,8 @@ export function isEventInCalendarEntry(
   startEvent.getFullYear() === entry.year &&
   startEvent.toLocaleString("en-US", { month: "short" }) ===
     entry.month
+}
+
+export function getDateFromCalendarEntry ({date, year,month}: CalendarEntryUiState){
+  return parse(`${date} ${month} ${year}`, 'd MMM yyyy', new Date());
 }
