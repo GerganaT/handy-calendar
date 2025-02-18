@@ -26,11 +26,11 @@ import { useTriggerLoadingSkeleton } from "../utils/helperHooks";
 
 const WeekCalendarPage = () => {
   const { data: events, error } = useGetEvents();
-  const { currentDate, initializeWeeklyDate } = useCalendarNavigationStore();
+  const { currentDate, initializeCurrentDate } = useCalendarNavigationStore();
   const { shouldShowLoadingSkeleton, showLoadingSkeleton } =
     useTriggerLoadingSkeleton();
 
-  useEffect(() => initializeWeeklyDate(), []);
+  useEffect(() => initializeCurrentDate(), []);
 
   const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
@@ -59,8 +59,11 @@ const WeekCalendarPage = () => {
   return (
     <>
       {error && <ErrorAlert error={error} />}
-      <div className="flex flex-col w-full  rounded-xl p-4 m-4 bg-blue-100">
-        <div className="flex flex-row w-full h-full">
+      <div className="flex flex-col w-full rounded-xl p-4 m-4 bg-blue-100">
+        <div
+          key={currentDate.getDate()}
+          className="flex flex-row w-full h-full animate-slide-in"
+        >
           <div className="flex flex-col">
             <div className="h-10 sm:h-16"></div>
             <HoursIndicator />
@@ -354,8 +357,11 @@ interface EventHolderProps {
 
 const EventHolder = ({ event, onClick }: EventHolderProps) => {
   return (
-    <div className="h-full w-full px-1 cursor-pointer" onClick={onClick}>
-      <div className="flex items-center gap-1 text-xs">
+    <div
+      className="h-full w-full px-1 cursor-pointer hover:bg-gray-400/35"
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-1 text-xs select-none">
         <span className="flex-shrink-0">{getEventIcon(event.type)}</span>
         <span className="font-semibold truncate flex-grow">{event.title}</span>
         <span className="flex-shrink-0">

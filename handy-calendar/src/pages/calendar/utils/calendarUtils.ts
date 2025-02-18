@@ -6,6 +6,7 @@ export const WEEK_DAYS_COUNT = 7;
 export const FULL_DAY_NIGHT_HOURS = 24;
 export const FIRST_DAY_OF_THE_MONTH = 1;
 export const MINUTES_IN_AN_HOUR = 60;
+export const WEEK_START_DAY_INDEX = 0;
 
 export const getTodayDateDetails = ():CalendarEntryUiState => {
     const today = new Date();

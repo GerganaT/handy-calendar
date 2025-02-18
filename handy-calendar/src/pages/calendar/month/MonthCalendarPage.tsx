@@ -54,7 +54,10 @@ const MonthCalendarPage = () => {
     <>
       {error && <ErrorAlert error={error} />}
       <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
-        <div className="grid grid-cols-7 overflow-clip h-full rounded-xl ">
+        <div
+          key={currentDate.getMonth()}
+          className="grid grid-cols-7 overflow-clip h-full rounded-xl animate-slide-in "
+        >
           {shouldShowLoadingSkeleton
             ? Array.from({ length: CALENDAR_GRID_LENGTH }).map((_, index) => (
                 <DateElementSkeleton key={index} />

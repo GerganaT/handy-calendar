@@ -1,27 +1,28 @@
 import { endOfWeek, format, isSameMonth, isSameYear, startOfWeek } from "date-fns";
 
-import { WEEKLY_ROUTE } from "./constants";
+import { WEEK_START_DAY_INDEX } from "@/pages/calendar/utils/calendarUtils";
+import { DAILY_ROUTE, WEEKLY_ROUTE } from "./constants";
 
 export function getCalendarNavigatorText(currentRoute:string,currentDate: Date) {
 
-    // fall-through behavior is intentional for case WEEKLY_ROUTE to avoid code repetition
     switch (currentRoute) {
         case WEEKLY_ROUTE:{
             
-            const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
-            const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
-      
-            if (!isSameMonth(weekStart, weekEnd) && isSameYear(weekStart, weekEnd)) {
-              return `${format(weekStart, "MMM")} - ${format(weekEnd, "MMM yyyy")}`;
-            }
-      
-            if (!isSameYear(weekStart, weekEnd)) {
-              return `${format(weekStart, "MMM yyyy")} - ${format(
+            const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_START_DAY_INDEX });
+            const weekEnd = endOfWeek(currentDate, { weekStartsOn: WEEK_START_DAY_INDEX });
+
+            switch(true){
+              case !isSameMonth(weekStart, weekEnd) && isSameYear(weekStart, weekEnd): return `${format(weekStart, "MMM")} - ${format(weekEnd, "MMM yyyy")}`;
+              case !isSameYear(weekStart, weekEnd):  return `${format(weekStart, "MMM yyyy")} - ${format(
                 weekEnd,
                 "MMM yyyy"
               )}`;
+              default: return format(currentDate, "MMMM yyyy");
             }
         }
+        case DAILY_ROUTE:{
+          return format(currentDate,'MMMM d, yyyy' );
+      }
         default: return format(currentDate, "MMMM yyyy");
     }
     }

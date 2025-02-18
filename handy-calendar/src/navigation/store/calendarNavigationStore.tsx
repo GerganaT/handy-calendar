@@ -1,25 +1,28 @@
 import {
+  addDays,
   addMonths,
   addWeeks,
   isSameMonth,
   startOfMonth,
+  subDays,
   subMonths,
   subWeeks,
 } from "date-fns";
 import { create } from "zustand";
-import { WEEKLY_ROUTE } from "../constants";
+import { DAILY_ROUTE, WEEKLY_ROUTE } from "../constants";
 
 interface CalendarNavigationState {
   currentDate: Date;
-  initializeWeeklyDate: () => void;
+  initializeCurrentDate: () => void;
   prevPeriod: (currentPeriodRoute: string) => void;
   nextPeriod: (currentPeriodRoute: string) => void;
+  resetToToday: () => void;
 }
 
 export const useCalendarNavigationStore = create<CalendarNavigationState>(
   (set) => ({
     currentDate: new Date(),
-    initializeWeeklyDate: () =>
+    initializeCurrentDate: () =>
       set((state) => ({
         currentDate: isSameMonth(state.currentDate, new Date())
           ? state.currentDate
@@ -39,6 +42,7 @@ export const useCalendarNavigationStore = create<CalendarNavigationState>(
           currentPeriodRoute
         ),
       })),
+    resetToToday: () => set({ currentDate: new Date() }),
   })
 );
 
@@ -47,6 +51,8 @@ function setCurrentDateToPrevPeriod(
   currentPeriodRoute: string
 ) {
   switch (currentPeriodRoute) {
+    case DAILY_ROUTE:
+      return subDays(currentDate, 1);
     case WEEKLY_ROUTE:
       return subWeeks(currentDate, 1);
     default:
@@ -59,6 +65,8 @@ function setCurrentDateToNextPeriod(
   currentPeriodRoute: string
 ) {
   switch (currentPeriodRoute) {
+    case DAILY_ROUTE:
+      return addDays(currentDate, 1);
     case WEEKLY_ROUTE:
       return addWeeks(currentDate, 1);
     default:
