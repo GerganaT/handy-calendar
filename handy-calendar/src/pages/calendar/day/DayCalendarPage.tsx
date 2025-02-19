@@ -1,30 +1,108 @@
-import { useMemo } from "react";
+import ErrorAlert from "@/components/ui/ErrorAlert";
+import DailyEvents from "@/components/ui/event/DailyEvents";
+import EventDetailsDialog from "@/components/ui/event/EventDetailsDialog";
+import EventsSkeleton from "@/components/ui/event/EventsSkeleton";
+import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
+import { useGetEvents } from "@/services/calendar/event/eventService";
+import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
+import EventUiState from "@/types/calendar/event/EventUiState";
+import { isToday, isWithinInterval, startOfDay } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
 import {
   formatHourInTwelveHourFormat,
   FULL_DAY_NIGHT_HOURS,
-  getTodayDateDetails,
+  getDateDetails,
+  getDateFromCalendarEntry,
 } from "../utils/calendarUtils";
+import { useTriggerLoadingSkeleton } from "../utils/helperHooks";
 
 const DayCalendarPage = () => {
+  const { data: events, error } = useGetEvents();
+  const { currentDate, initializeCurrentDate } = useCalendarNavigationStore();
+  const { shouldShowLoadingSkeleton, showLoadingSkeleton } =
+    useTriggerLoadingSkeleton();
+  const [clickedEvent, setClickedEvent] = useState<EventUiState | null>(null);
+
+  useEffect(() => initializeCurrentDate(), []);
+
+  const currentDateWithEvents = useMemo(() => {
+    showLoadingSkeleton();
+    let dateDetails = getDateDetails(currentDate);
+    if (events && events.length > 0) {
+      dateDetails = {
+        ...dateDetails,
+        events: events?.filter((event) => {
+          return isWithinInterval(
+            startOfDay(getDateFromCalendarEntry(dateDetails)),
+            {
+              start: startOfDay(event.startEvent),
+              end: startOfDay(event.endEvent),
+            }
+          );
+        }),
+      } as CalendarEntryUiState;
+    }
+
+    return dateDetails;
+  }, [currentDate, events]);
+
   return (
-    <div className="flex flex-col w-full rounded-xl p-4 m-4 bg-blue-100">
-      <DateHeader />
-      <div className="flex w-full h-full">
-        <HoursIndicator />
-        <HoursAgenda />
+    <>
+      {error && <ErrorAlert error={error} />}
+      <div
+        key={currentDate.getDate()}
+        className="flex flex-col w-full rounded-xl p-4 m-4 bg-blue-100 animate-slide-in"
+      >
+        {clickedEvent && (
+          <EventDetailsDialog
+            selectedEvent={clickedEvent}
+            onDialogDismiss={() => setClickedEvent(null)}
+            onEventDeleted={() => setClickedEvent(null)}
+          />
+        )}
+        <DateHeader
+          day={currentDateWithEvents.day}
+          date={currentDateWithEvents.date}
+          isToday={isToday(currentDate)}
+        />
+        <div className="flex w-full h-full">
+          <div className="w-16 flex-none">
+            <HoursIndicator />
+          </div>
+          <div className="flex-1 relative">
+            <HoursAgenda />
+            <div
+              className="absolute top-0 left-0 right-0 bottom-0"
+              onClick={() => setClickedEvent(null)}
+            >
+              {shouldShowLoadingSkeleton ? (
+                <EventsSkeleton />
+              ) : (
+                <DailyEvents
+                  calendarEntry={currentDateWithEvents}
+                  passedEvent={clickedEvent}
+                  onEventClick={(event) => setClickedEvent(event)}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default DayCalendarPage;
+interface DateHeaderProps {
+  day: string;
+  date: string;
+  isToday: boolean;
+}
 
-const DateHeader = () => {
-  const todayDateDetails = useMemo(() => getTodayDateDetails(), []);
+const DateHeader = ({ day, date, isToday }: DateHeaderProps) => {
   return (
     <div className="flex ps-16 items-start flex-col py-2 text-lg sm:text-xl md:text-2xl">
-      <h1 className="font-medium">{todayDateDetails.day}</h1>
-      <h1 className="font-bold">{todayDateDetails.date}</h1>
+      <h1 className={`font-medium ${isToday ? "text-blue-600" : ""}`}>{day}</h1>
+      <h1 className={`font-bold ${isToday ? "text-blue-600" : ""}`}>{date}</h1>
     </div>
   );
 };
@@ -45,7 +123,7 @@ const HoursIndicator = () => (
       {Array.from({ length: FULL_DAY_NIGHT_HOURS }).map((_, hour) => (
         <div
           key={hour}
-          className="flex items-end justify-end pr-2 font-medium text-sm text-gray-600 h-10"
+          className="flex items-start justify-end pr-2 font-medium text-sm text-gray-600 h-10"
         >
           {formatHourInTwelveHourFormat(hour)}
         </div>
@@ -53,3 +131,5 @@ const HoursIndicator = () => (
     </div>
   </div>
 );
+
+export default DayCalendarPage;

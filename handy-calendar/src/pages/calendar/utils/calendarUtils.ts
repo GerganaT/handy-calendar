@@ -1,5 +1,5 @@
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
-import { parse } from "date-fns";
+import { format, parse } from "date-fns";
 
 export const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const WEEK_DAYS_COUNT = 7;
@@ -8,11 +8,16 @@ export const FIRST_DAY_OF_THE_MONTH = 1;
 export const MINUTES_IN_AN_HOUR = 60;
 export const WEEK_START_DAY_INDEX = 0;
 
-export const getTodayDateDetails = ():CalendarEntryUiState => {
-    const today = new Date();
-    const day = WEEK_DAYS[today.getDay()];
-    const formattedDate = formatDate(today.getDate());
-    return { day, date: formattedDate,events: [] };
+export const getDateDetails = (date: Date):CalendarEntryUiState => {
+    const providedDate = new Date(date);
+    const day = WEEK_DAYS[providedDate.getDay()];
+    const formattedDate = formatDate(providedDate.getDate());
+    return { day,
+      date: formattedDate,
+      month: getCurrentMonthShortText(providedDate),
+      year: providedDate.getFullYear(),
+      events: [],
+     };
   };
 
 export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
@@ -26,7 +31,7 @@ export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
       const day = WEEK_DAYS[i];
       const formattedDate = formatDate(weekDate.getDate());
       week.push({ day, date: formattedDate,
-         month: getCurrentMonthText(weekDate),
+         month: getCurrentMonthShortText(weekDate),
          year: weekDate.getFullYear(),
          events: [],
          });
@@ -85,7 +90,7 @@ export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
       currentMonthDates.push({ 
         day,
         date: formattedDate,
-        month: getCurrentMonthText(selectedDate),
+        month: getCurrentMonthShortText(selectedDate),
         year: year,
         events: [],
        });
@@ -151,8 +156,8 @@ export const getWeekDates = (date:Date): CalendarEntryUiState[] => {
     return  prevDate.toLocaleString('en-US', { month: 'short' });
   }
 
-  function getCurrentMonthText(selectedDate: Date){
-    return new Date(selectedDate).toLocaleString('en-US', { month: 'short' });
+  function getCurrentMonthShortText(selectedDate: Date){
+    return format(new Date(selectedDate), 'MMM');
   }
 
   export const formatHourInTwelveHourFormat = (hour:number) => 
