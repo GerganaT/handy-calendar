@@ -6,7 +6,7 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
-import { isSameDay } from "date-fns";
+import { isToday } from "date-fns";
 import { useMemo, useState } from "react";
 import {
   FIRST_DAY_OF_THE_MONTH,
@@ -32,7 +32,6 @@ const MonthCalendarPage = () => {
 
   const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
-
     let daysWithEvents = getMonthDates(currentDate);
     if (events && events.length > 0) {
       daysWithEvents = daysWithEvents.map(
@@ -100,17 +99,17 @@ const CalendarEntryElement = ({
   provideEvent,
 }: CalendarEntryProps) => {
   return (
-    <div
-      className={`flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border ${
-        isSameDay(getDateFromCalendarEntry(entry), new Date())
-          ? "bg-blue-400  text-white"
-          : "bg-white"
-      } `}
-    >
+    <div className="flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border bg-white">
       {cellIndex < WEEK_DAYS_COUNT && (
         <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
       )}
-      <h1 className="font-normal">
+      <h1
+        className={`${
+          isToday(getDateFromCalendarEntry(entry))
+            ? "text-blue-600 font-bold"
+            : "font-normal"
+        }`}
+      >
         {entry.date === `${FIRST_DAY_OF_THE_MONTH}`
           ? `${entry.month} ${entry.date}`
           : entry.date}
