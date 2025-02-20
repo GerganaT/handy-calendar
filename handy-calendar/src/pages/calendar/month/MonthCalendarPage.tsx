@@ -52,10 +52,10 @@ const MonthCalendarPage = () => {
   return (
     <>
       {error && <ErrorAlert error={error} />}
-      <div className="rounded-xl overflow-hidden border p-4 mt-8 h-screen w-full bg-blue-100">
+      <div className="sm:rounded-xl overflow-hidden border sm:p-4 mt-2 sm:mt-8 h-screen w-full sm:bg-blue-100">
         <div
           key={currentDate.getMonth()}
-          className="grid grid-cols-7 overflow-clip h-full rounded-xl animate-slide-in "
+          className="grid grid-cols-7 overflow-y-scroll lg:overflow-clip h-full rounded-xl animate-slide-in "
         >
           {shouldShowLoadingSkeleton
             ? Array.from({ length: CALENDAR_GRID_LENGTH }).map((_, index) => (
@@ -99,7 +99,7 @@ const CalendarEntryElement = ({
   provideEvent,
 }: CalendarEntryProps) => {
   return (
-    <div className="flex items-center flex-col py-2 text-lg sm:text-xl md:text-2xl border bg-white">
+    <div className="flex items-center flex-col py-2 text-sm sm:text-xl md:text-2xl border bg-white select-none">
       {cellIndex < WEEK_DAYS_COUNT && (
         <h1 className="font-semibold">{WEEK_DAYS[cellIndex]}</h1>
       )}

@@ -51,7 +51,7 @@ const DayCalendarPage = () => {
       {error && <ErrorAlert error={error} />}
       <div
         key={currentDate.getDate()}
-        className="flex flex-col w-full rounded-xl p-4 m-4 bg-blue-100 animate-slide-in"
+        className="flex flex-col w-full rounded-xl sm:p-4 sm:m-4 sm:bg-blue-100 animate-slide-in"
       >
         {clickedEvent && (
           <EventDetailsDialog
@@ -66,9 +66,8 @@ const DayCalendarPage = () => {
           isToday={isToday(currentDate)}
         />
         <div className="flex w-full h-full">
-          <div className="w-16 flex-none">
-            <HoursIndicator />
-          </div>
+          <HoursIndicator />
+
           <div className="flex-1 relative">
             <HoursAgenda />
             <div
@@ -100,7 +99,7 @@ interface DateHeaderProps {
 
 const DateHeader = ({ day, date, isToday }: DateHeaderProps) => {
   return (
-    <div className="flex ps-16 items-start flex-col py-2 text-lg sm:text-xl md:text-2xl">
+    <div className="flex ps-11 sm:ps-16 items-start flex-col py-2 text-sm sm:text-xl md:text-2xl select-none">
       <h1 className={`font-medium ${isToday ? "text-blue-600" : ""}`}>{day}</h1>
       <h1 className={`font-bold ${isToday ? "text-blue-600" : ""}`}>{date}</h1>
     </div>
@@ -109,7 +108,7 @@ const DateHeader = ({ day, date, isToday }: DateHeaderProps) => {
 
 const HoursAgenda = () => (
   <div className="w-full h-full">
-    <div className="grid grid-cols-1 grid-rows-24 w-full bg-white rounded-xl">
+    <div className="grid grid-cols-1 grid-rows-24 w-full bg-white rounded-xl select-none">
       {Array.from({ length: FULL_DAY_NIGHT_HOURS }).map((_, index) => (
         <div key={index} className="border border-gray-300 min-h-10"></div>
       ))}
@@ -119,11 +118,11 @@ const HoursAgenda = () => (
 
 const HoursIndicator = () => (
   <div className="flex flex-col">
-    <div className="grid grid-rows-24 w-16">
+    <div className="grid grid-rows-24 w-11 sm:w-16">
       {Array.from({ length: FULL_DAY_NIGHT_HOURS }).map((_, hour) => (
         <div
           key={hour}
-          className="flex items-start justify-end pr-2 font-medium text-sm text-gray-600 h-10"
+          className="flex items-start justify-end pr-1 sm:pr-2 font-medium text-xs sm:text-sm text-gray-600 h-10 select-none"
         >
           {formatHourInTwelveHourFormat(hour)}
         </div>

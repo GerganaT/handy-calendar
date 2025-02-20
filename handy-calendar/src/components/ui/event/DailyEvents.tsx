@@ -7,7 +7,6 @@ import {
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState, { EventType } from "@/types/calendar/event/EventUiState";
 import { differenceInMinutes, isSameDay, startOfDay } from "date-fns";
-import { Cake, Calendar, CheckSquare } from "lucide-react";
 
 interface DailyEventsProps {
   calendarEntry: CalendarEntryUiState;
@@ -174,35 +173,16 @@ const EventHolder = ({ event, onClick }: EventHolderProps) => {
       className="h-full w-full px-1 cursor-pointer hover:bg-gray-400/35"
       onClick={onClick}
     >
-      <div className="flex items-center gap-1 text-xs">
-        <span className="flex-shrink-0 select-none">
-          {getEventIcon(event.type)}
-        </span>
-        <span className="font-semibold truncate flex-grow select-none">
-          {event.title}
-        </span>
-        <span className="flex-shrink-0 select-none">
-          {twelveHoursFormattedTime(event.startEvent)}
+      <div className="flex items-center text-xs">
+        <span className="font-semibold overflow-hidden whitespace-nowrap flex-grow select-none">
+          {`${event.title}, ${twelveHoursFormattedTime(event.startEvent)}`}
         </span>
       </div>
       {event.description && (
-        <div className="text-xs truncate mt-0.5 select-none">
+        <div className="text-xs overflow-hidden whitespace-nowrap mt-0.5 select-none">
           {event.description}
         </div>
       )}
     </div>
   );
-};
-
-const getEventIcon = (type: EventType) => {
-  switch (type) {
-    case EventType.Birthday:
-      return <Cake size={14} />;
-    case EventType.Meeting:
-      return <Calendar size={14} />;
-    case EventType.Task:
-      return <CheckSquare size={14} />;
-    default:
-      return <Calendar size={14} />;
-  }
 };

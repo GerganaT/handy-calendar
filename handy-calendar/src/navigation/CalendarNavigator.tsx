@@ -18,7 +18,7 @@ const CalendarNavigator = () => {
   );
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       <Button
         variant="outline"
         onClick={resetToToday}
@@ -27,11 +27,11 @@ const CalendarNavigator = () => {
         Today
       </Button>
 
-      <Card className="flex items-center justify-center w-50 pr-2 sm:w-80 text-sm sm:text-2xl border-none shadow-none">
+      <Card className="flex items-center justify-center w-50  sm:w-80 text-sm sm:text-2xl border-none shadow-none">
         <Button variant="ghost" onClick={() => prevPeriod(currentRoute)}>
           <ChevronLeft />
         </Button>
-        <span>{navigatorText}</span>
+        <span className="text-center">{navigatorText}</span>
         <Button variant="ghost" onClick={() => nextPeriod(currentRoute)}>
           <ChevronRight />
         </Button>

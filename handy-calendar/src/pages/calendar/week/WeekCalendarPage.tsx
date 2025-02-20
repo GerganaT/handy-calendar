@@ -52,7 +52,7 @@ const WeekCalendarPage = () => {
   return (
     <>
       {error && <ErrorAlert error={error} />}
-      <div className="flex flex-col w-full rounded-xl p-4 m-4 bg-blue-100">
+      <div className="flex flex-col w-full rounded-xl sm:p-4 sm:m-4 sm:bg-blue-100">
         <div
           key={currentDate.getDate()}
           className="flex flex-row w-full h-full animate-slide-in"
@@ -77,11 +77,11 @@ const WeekCalendarPage = () => {
 export default WeekCalendarPage;
 
 const HoursIndicator = () => (
-  <div className="grid grid-rows-24 w-16">
+  <div className="grid grid-rows-24 w-11 sm:w-16">
     {Array.from({ length: FULL_DAY_NIGHT_HOURS }).map((_, hour) => (
       <div
         key={hour}
-        className="flex items-start justify-end pr-2 font-medium text-sm text-gray-600  h-10"
+        className="flex items-start justify-end pr-1 sm:pr-2 font-medium text-xs sm:text-sm text-gray-600 h-10"
       >
         {formatHourInTwelveHourFormat(hour)}
       </div>
@@ -95,7 +95,7 @@ interface WeekDatesHeaderProps {
 
 const WeekDatesHeader = ({ weekDates }: WeekDatesHeaderProps) => {
   return (
-    <div className="grid grid-cols-7 text-center bg-blue-100">
+    <div className="grid grid-cols-7 text-center sm:bg-blue-100">
       {weekDates.length > 0 &&
         weekDates.map((event, index) => (
           <div
@@ -105,8 +105,8 @@ const WeekDatesHeader = ({ weekDates }: WeekDatesHeaderProps) => {
               "bg-blue-400 text-white rounded-t-lg"
             } flex flex-col text-sm sm:text-base md:text-lg lg:text-xl pb-2`}
           >
-            <span className="font-medium">{event.day}</span>
-            <span className="font-bold">{event.date}</span>
+            <span className="font-medium select-none">{event.day}</span>
+            <span className="font-bold select-none">{event.date}</span>
           </div>
         ))}
     </div>

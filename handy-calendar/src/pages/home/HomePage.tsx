@@ -10,13 +10,13 @@ const HomePage = () => {
     <>
       <ManageEventDialog>
         <Button
-          className={`fixed bottom-5 right-5 sm:bottom-10 sm:right-10 bg-blue-400 hover:bg-blue-600 text-black text-sm sm:text-lg m-6 rounded-full shadow-lg sm:scale-150 z-50`}
+          className={`select-none fixed bottom-1 right-1 lg:bottom-10 lg:right-10 bg-blue-400 hover:bg-blue-600 text-black text-sm sm:text-lg m-6 rounded-full shadow-lg lg:scale-150 z-50`}
         >
           Create Event
         </Button>
       </ManageEventDialog>
-      <div className="flex flex-col items-center m-8">
-        <div className="flex flex-row p-2">
+      <div className="flex flex-col items-center my-2 sm:my-8 sm:mx-8">
+        <div className="flex flex-row p-1 sm:p-2">
           <CalendarNavigator />
           <NavigationDropdown />
         </div>
