@@ -6,13 +6,12 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
-import { isToday } from "date-fns";
+import { isToday, isWithinInterval, startOfDay } from "date-fns";
 import { useMemo, useState } from "react";
 import {
   FIRST_DAY_OF_THE_MONTH,
   getDateFromCalendarEntry,
   getMonthDates,
-  isEventStartInCalendarEntry,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
 } from "../utils/calendarUtils";
@@ -39,8 +38,13 @@ const MonthCalendarPage = () => {
           ({
             ...entry,
             events: events?.filter((event) => {
-              const startEvent = event.startEvent;
-              return isEventStartInCalendarEntry(startEvent, entry);
+              return isWithinInterval(
+                startOfDay(getDateFromCalendarEntry(entry)),
+                {
+                  start: startOfDay(event.startEvent),
+                  end: startOfDay(event.endEvent),
+                }
+              );
             }),
           } as CalendarEntryUiState)
       );

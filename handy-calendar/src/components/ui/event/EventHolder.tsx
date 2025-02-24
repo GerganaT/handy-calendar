@@ -9,15 +9,15 @@ interface EventHolderProps {
 
 const EventHolder = ({ event, onClick }: EventHolderProps) => {
   const eventTypeColor = {
-    [EventType.Birthday]: "bg-green",
-    [EventType.Meeting]: "bg-blue",
-    [EventType.Task]: "bg-orange",
+    [EventType.Birthday]: "bg-green-300",
+    [EventType.Meeting]: "bg-blue-300",
+    [EventType.Task]: "bg-orange-300",
   }[event.type];
 
   return (
     <div
       onClick={() => onClick(event.id)}
-      className={`flex items-center w-2/3 ps-1 m-0.5 ${eventTypeColor}-300 rounded-lg hover:bg-gray-200 hover:cursor-pointer select-none`}
+      className={`flex items-center w-2/3 ps-1 m-0.5 ${eventTypeColor} rounded-lg hover:bg-gray-200 hover:cursor-pointer select-none`}
     >
       <span className="text-xs sm:text-sm font-medium overflow-hidden whitespace-nowrap ">
         {` ${event.title}, ${twelveHoursFormattedTime(event.startEvent)}`}
