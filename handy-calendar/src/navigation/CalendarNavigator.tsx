@@ -27,7 +27,7 @@ const CalendarNavigator = () => {
         Today
       </Button>
 
-      <Card className="flex items-center justify-center w-50  sm:w-80 text-sm sm:text-2xl border-none shadow-none">
+      <Card className="flex items-center justify-center w-50  sm:w-80 text-sm sm:text-2xl border-none shadow-none select-none">
         <Button variant="ghost" onClick={() => prevPeriod(currentRoute)}>
           <ChevronLeft />
         </Button>
