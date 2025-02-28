@@ -77,22 +77,10 @@ const getEventStackIndex = (
   event: EventUiState,
   allEvents: EventUiState[]
 ): number => {
-  const areEventsOverlapped = (
-    event1: EventUiState,
-    event2: EventUiState
-  ): boolean => {
-    return (
-      event1.startEvent.getTime() < event2.endEvent.getTime() &&
-      event2.startEvent.getTime() < event1.endEvent.getTime()
-    );
-  };
-
-  const overlappingEvents = allEvents
-    .filter((event) => areEventsOverlapped(event, event))
-    .sort(
-      (previousEvent, nextEvent) =>
-        previousEvent.startEvent.getTime() - nextEvent.startEvent.getTime()
-    );
+  const overlappingEvents = [...allEvents].sort(
+    (previousEvent, nextEvent) =>
+      previousEvent.startEvent.getTime() - nextEvent.startEvent.getTime()
+  );
 
   return overlappingEvents.indexOf(event);
 };
@@ -139,14 +127,11 @@ const calculateEventPosition = (
 };
 
 const getEventContainerDynamicWidth = (eventStackIndex: number) => {
-  const eventContainerMinimumWidthPercentage = 40;
-  const eventContainerBaseWidthPercentage = 95;
-  const eventContainerWidthReductionPercentage = 20;
-  return Math.max(
-    eventContainerBaseWidthPercentage -
-      eventStackIndex * eventContainerWidthReductionPercentage,
-    eventContainerMinimumWidthPercentage
-  );
+  // all numbers below are percentages
+  const minimumWidth = 40;
+  const baseWidth = 95;
+  const widthReduction = 20;
+  return Math.max(baseWidth - eventStackIndex * widthReduction, minimumWidth);
 };
 
 const getEventColor = (type: EventType) => {
