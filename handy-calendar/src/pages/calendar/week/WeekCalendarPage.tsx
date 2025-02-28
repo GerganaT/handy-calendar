@@ -27,9 +27,9 @@ const WeekCalendarPage = () => {
 
   const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
-    let daysWithEvents = getWeekDates(currentDate);
+    let weekDates = getWeekDates(currentDate);
     if (events && events.length > 0) {
-      daysWithEvents = daysWithEvents.map(
+      weekDates = weekDates.map(
         (entry) =>
           ({
             ...entry,
@@ -46,7 +46,7 @@ const WeekCalendarPage = () => {
       );
     }
 
-    return daysWithEvents;
+    return weekDates;
   }, [currentDate, events]);
 
   return (
