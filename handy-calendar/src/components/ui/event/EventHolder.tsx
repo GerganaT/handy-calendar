@@ -1,5 +1,6 @@
 import { twelveHoursFormattedTime } from "@/pages/calendar/utils/calendarUtils";
 import EventUiState, { EventType } from "@/types/calendar/event/EventUiState";
+import { useEffect, useState } from "react";
 
 const EVENT_TOP_POSITION_HEADER_SPACING = 5.0;
 const EVENT_TOP_POSITION_NON_HEADER_SPACING = 3.0;
@@ -26,6 +27,18 @@ const EventHolder = ({
   isUnderWeekdayHeader,
   eventIndex = 0,
 }: EventHolderProps) => {
+  const [eventResponsiveSpacing, setEventResponsiveSpacing] = useState(0);
+
+  useEffect(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleResize = () => {
+    setEventResponsiveSpacing(window.innerWidth >= 768 ? 1.5 : 0);
+  };
+
   const eventTypeColor = {
     [EventType.Birthday]: "bg-green-300",
     [EventType.Meeting]: "bg-blue-300",
@@ -52,7 +65,7 @@ const EventHolder = ({
       style={{
         top: isMultiDay
           ? `${
-              EVENT_DEFAULT_SPACING +
+              eventResponsiveSpacing +
               eventTopPositionIndex +
               eventIndex * EVENT_DEFAULT_SPACING
             }rem`
