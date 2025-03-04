@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const LOADING_DURATION_IN_SECONDS = 1000;
+const LOADING_DURATION_IN_MILLISECONDS = 1000;
 
 export const useTriggerLoadingSkeleton = () => {
   const [shouldShowLoadingSkeleton, setShouldShowLoadingSkeleton] =
@@ -9,7 +9,7 @@ export const useTriggerLoadingSkeleton = () => {
     setShouldShowLoadingSkeleton(true);
     setTimeout(() => {
       setShouldShowLoadingSkeleton(false);
-    }, LOADING_DURATION_IN_SECONDS);
+    }, LOADING_DURATION_IN_MILLISECONDS);
   };
   return { shouldShowLoadingSkeleton, showLoadingSkeleton };
 };
