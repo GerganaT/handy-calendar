@@ -2,6 +2,7 @@ import ErrorAlert from "@/components/ui/ErrorAlert";
 import DailyEvents from "@/components/ui/event/DailyEvents";
 import EventDetailsDialog from "@/components/ui/event/EventDetailsDialog";
 import EventsSkeleton from "@/components/ui/event/EventsSkeleton";
+import TimeIndicator from "@/components/ui/TimeIndicator";
 import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
@@ -64,6 +65,7 @@ const WeekCalendarPage = () => {
           <div className="w-full h-full">
             <WeekDatesHeader weekDates={totalDaysWithEvents} />
             <WeekdaysAgenda
+              key={events?.length}
               weekCalendarEntries={totalDaysWithEvents}
               shouldShowLoadingSkeleton={shouldShowLoadingSkeleton}
             />
@@ -139,6 +141,7 @@ const WeekdaysAgenda = ({
           className="absolute inset-0 grid grid-cols-7"
           onClick={() => setClickedEvent(null)}
         >
+          <TimeIndicator />
           {shouldShowLoadingSkeleton ? (
             <LoadingSkeletons />
           ) : (

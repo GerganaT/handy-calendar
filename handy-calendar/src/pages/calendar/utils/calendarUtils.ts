@@ -200,3 +200,7 @@ export function isEventStartInCalendarEntry(
 export function getDateFromCalendarEntry ({date, year,month}: CalendarEntryUiState){
   return parse(`${date} ${month} ${year}`, 'd MMM yyyy', new Date());
 }
+
+export const getTimePositionOffset = (date: Date) =>
+  (date.getHours() + date.getMinutes() / MINUTES_IN_AN_HOUR) *
+  (100 / FULL_DAY_NIGHT_HOURS);

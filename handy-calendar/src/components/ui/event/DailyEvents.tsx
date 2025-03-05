@@ -1,12 +1,12 @@
+import usePositionOffset from "@/hooks/use-position-offset";
 import {
-  FULL_DAY_NIGHT_HOURS,
   getDateFromCalendarEntry,
-  MINUTES_IN_AN_HOUR,
+  getTimePositionOffset,
   twelveHoursFormattedTime,
 } from "@/pages/calendar/utils/calendarUtils";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState, { EventType } from "@/types/calendar/event/EventUiState";
-import { differenceInMinutes, isSameDay, startOfDay } from "date-fns";
+import { differenceInMinutes, isSameDay, isToday, startOfDay } from "date-fns";
 
 interface DailyEventsProps {
   calendarEntry: CalendarEntryUiState;
@@ -14,11 +14,15 @@ interface DailyEventsProps {
   onEventClick: (clickedEvent: EventUiState) => void;
 }
 
+const CLICKED_EVENT_ON_TOP_INDEX = 31;
+
 const DailyEvents = ({
   calendarEntry,
   passedEvent,
   onEventClick,
 }: DailyEventsProps) => {
+  const positionOffset = usePositionOffset();
+
   const currentDate = startOfDay(getDateFromCalendarEntry(calendarEntry));
 
   const stackedEvents = [...calendarEntry.events].sort(
@@ -32,7 +36,16 @@ const DailyEvents = ({
   );
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full" key={positionOffset}>
+      {isToday(currentDate) && stackedEvents.length > 0 && (
+        <div
+          className="opacity-50 h-full rounded-md absolute pointer-events-none z-20"
+          style={{
+            background: `linear-gradient(#3b82f6 ${positionOffset}%, transparent ${positionOffset}%)`,
+            width: `95%`,
+          }}
+        ></div>
+      )}
       {stackedEvents.map((event, eventIndex) => {
         const eventStackIndex = getEventStackIndex(event, calendarEntry.events);
 
@@ -52,9 +65,12 @@ const DailyEvents = ({
               width: `${getEventContainerDynamicWidth(eventStackIndex)}%`,
               top: `${topPosition}%`,
               height: `${containerHeight}%`,
-              backgroundColor: getEventColor(event.type),
+              background: getEventColor(event.type),
               transform: `translateZ(${eventStackIndex * 2}px)`,
-              zIndex: event.id === passedEvent?.id ? 50 : eventStackIndex + 1,
+              zIndex:
+                event.id === passedEvent?.id
+                  ? CLICKED_EVENT_ON_TOP_INDEX
+                  : eventStackIndex + 1,
             }}
           >
             <EventHolder
@@ -91,10 +107,6 @@ const calculateEventPosition = (
   eventEndDay: Date,
   event: EventUiState
 ): { topPosition: number; containerHeight: number } => {
-  const getTimePosition = (date: Date) =>
-    (date.getHours() + date.getMinutes() / MINUTES_IN_AN_HOUR) *
-    (100 / FULL_DAY_NIGHT_HOURS);
-
   switch (true) {
     case !isSameDay(currentDate, eventStartDay) &&
       !isSameDay(currentDate, eventEndDay):
@@ -104,19 +116,19 @@ const calculateEventPosition = (
       isSameDay(currentDate, eventEndDay):
       return {
         topPosition: 0,
-        containerHeight: getTimePosition(event.endEvent),
+        containerHeight: getTimePositionOffset(event.endEvent),
       };
 
     case isSameDay(currentDate, eventStartDay) &&
       !isSameDay(currentDate, eventEndDay):
       return {
-        topPosition: getTimePosition(event.startEvent),
-        containerHeight: 100 - getTimePosition(event.startEvent),
+        topPosition: getTimePositionOffset(event.startEvent),
+        containerHeight: 100 - getTimePositionOffset(event.startEvent),
       };
 
     default:
       return {
-        topPosition: getTimePosition(event.startEvent),
+        topPosition: getTimePositionOffset(event.startEvent),
         containerHeight: Math.max(
           (differenceInMinutes(event.endEvent, event.startEvent) / (24 * 60)) *
             100,

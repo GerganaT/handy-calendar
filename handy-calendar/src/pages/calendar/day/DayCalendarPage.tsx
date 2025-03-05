@@ -2,6 +2,7 @@ import ErrorAlert from "@/components/ui/ErrorAlert";
 import DailyEvents from "@/components/ui/event/DailyEvents";
 import EventDetailsDialog from "@/components/ui/event/EventDetailsDialog";
 import EventsSkeleton from "@/components/ui/event/EventsSkeleton";
+import TimeIndicator from "@/components/ui/TimeIndicator";
 import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigationStore";
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
@@ -69,6 +70,7 @@ const DayCalendarPage = () => {
           <HoursIndicator />
 
           <div className="flex-1 relative">
+            <TimeIndicator key={events?.length} />
             <HoursAgenda />
             <div
               className="absolute top-0 left-0 right-0 bottom-0"
