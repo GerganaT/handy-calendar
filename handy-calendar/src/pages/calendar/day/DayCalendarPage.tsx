@@ -47,6 +47,10 @@ const DayCalendarPage = () => {
     return dateDetails;
   }, [currentDate, events]);
 
+  const timeIndicatorKey = `${events?.length}-${
+    clickedEvent ? `event-${clickedEvent.id}` : "no-event"
+  }`;
+
   return (
     <>
       {error && <ErrorAlert error={error} />}
@@ -70,7 +74,7 @@ const DayCalendarPage = () => {
           <HoursIndicator />
 
           <div className="flex-1 relative">
-            <TimeIndicator key={events?.length} />
+            <TimeIndicator key={timeIndicatorKey} />
             <HoursAgenda />
             <div
               className="absolute top-0 left-0 right-0 bottom-0"

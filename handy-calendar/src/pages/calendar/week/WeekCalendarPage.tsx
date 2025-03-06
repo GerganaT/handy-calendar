@@ -65,7 +65,7 @@ const WeekCalendarPage = () => {
           <div className="w-full h-full">
             <WeekDatesHeader weekDates={totalDaysWithEvents} />
             <WeekdaysAgenda
-              key={events?.length}
+              eventsLength={events?.length}
               weekCalendarEntries={totalDaysWithEvents}
               shouldShowLoadingSkeleton={shouldShowLoadingSkeleton}
             />
@@ -118,13 +118,19 @@ const WeekDatesHeader = ({ weekDates }: WeekDatesHeaderProps) => {
 interface WeekdaysAgendaProps {
   weekCalendarEntries: CalendarEntryUiState[];
   shouldShowLoadingSkeleton: boolean;
+  eventsLength?: number;
 }
 
 const WeekdaysAgenda = ({
   weekCalendarEntries,
   shouldShowLoadingSkeleton,
+  eventsLength,
 }: WeekdaysAgendaProps) => {
   const [clickedEvent, setClickedEvent] = useState<EventUiState | null>(null);
+
+  const timeIndicatorKey = `${eventsLength}-${
+    clickedEvent ? `event-${clickedEvent.id}` : "no-event"
+  }`;
 
   return (
     <>
@@ -141,7 +147,7 @@ const WeekdaysAgenda = ({
           className="absolute inset-0 grid grid-cols-7"
           onClick={() => setClickedEvent(null)}
         >
-          <TimeIndicator />
+          <TimeIndicator key={timeIndicatorKey} />
           {shouldShowLoadingSkeleton ? (
             <LoadingSkeletons />
           ) : (
