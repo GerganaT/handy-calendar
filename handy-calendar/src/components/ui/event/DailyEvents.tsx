@@ -41,7 +41,7 @@ const DailyEvents = ({
         <div
           className="opacity-50 h-full rounded-md absolute pointer-events-none z-20"
           style={{
-            background: `linear-gradient(#3b82f6 ${positionOffset}%, transparent ${positionOffset}%)`,
+            background: `linear-gradient(#1d4ed8 ${positionOffset}%, transparent ${positionOffset}%)`,
             width: `95%`,
           }}
         ></div>
