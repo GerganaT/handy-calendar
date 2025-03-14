@@ -6,7 +6,15 @@ import {
 } from "@/pages/calendar/utils/calendarUtils";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState, { EventType } from "@/types/calendar/event/EventUiState";
-import { differenceInMinutes, isSameDay, isToday, startOfDay } from "date-fns";
+import {
+  differenceInMinutes,
+  endOfDay,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isToday,
+  startOfDay,
+} from "date-fns";
 
 interface DailyEventsProps {
   calendarEntry: CalendarEntryUiState;
@@ -36,54 +44,127 @@ const DailyEvents = ({
   );
 
   return (
-    <div className="relative h-full" key={positionOffset}>
-      {isToday(currentDate) && stackedEvents.length > 0 && (
-        <div
-          className="opacity-50 h-full rounded-md absolute pointer-events-none z-20"
-          style={{
-            background: `linear-gradient(#1d4ed8 ${positionOffset}%, transparent ${positionOffset}%)`,
-            width: `95%`,
-          }}
-        ></div>
-      )}
-      {stackedEvents.map((event, eventIndex) => {
-        const eventStackIndex = getEventStackIndex(event, calendarEntry.events);
+    positionOffset && (
+      <div className="relative h-full">
+        {stackedEvents.map((event, eventIndex) => {
+          const eventStackIndex = getEventStackIndex(
+            event,
+            calendarEntry.events
+          );
 
-        const { topPosition, containerHeight } = calculateEventPosition(
-          currentDate,
-          startOfDay(event.startEvent),
-          startOfDay(event.endEvent),
-          event
-        );
+          const { topPosition, containerHeight } = calculateEventPosition(
+            currentDate,
+            startOfDay(event.startEvent),
+            startOfDay(event.endEvent),
+            event
+          );
 
-        return (
-          <div
-            key={`${event.id}-${eventIndex}`}
-            className="absolute border shadow-md border-white rounded-md overflow-hidden cursor-pointer transition-all duration-200"
-            style={{
-              left: 0,
-              width: `${getEventContainerDynamicWidth(eventStackIndex)}%`,
-              top: `${topPosition}%`,
-              height: `${containerHeight}%`,
-              background: getEventColor(event.type),
-              transform: `translateZ(${eventStackIndex * 2}px)`,
-              zIndex:
-                event.id === passedEvent?.id
-                  ? CLICKED_EVENT_ON_TOP_INDEX
-                  : eventStackIndex + 1,
-            }}
-          >
-            <EventHolder
-              event={event}
-              onClick={(clickEvent) => {
-                clickEvent.stopPropagation();
-                onEventClick(event);
+          const calculateGradientPercentage = () => {
+            const now = new Date();
+            const currentTime = now.getTime();
+            const startEvent = event.startEvent;
+            const startEventTime = startEvent.getTime();
+            const endEvent = event.endEvent;
+            const endEventTime = endEvent.getTime();
+            const elapsedTimeSinceEventStart = currentTime - startEventTime;
+            const isCurrentDateToday = isToday(currentDate);
+
+            switch (true) {
+              case isCurrentDateToday &&
+                isBefore(startEvent, startOfDay(now)) &&
+                isToday(endEvent):
+                return Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    ((currentTime - startOfDay(now).getTime()) /
+                      (endEventTime - startOfDay(now).getTime())) *
+                      100
+                  )
+                );
+              case isCurrentDateToday &&
+                isToday(startEvent) &&
+                isAfter(endEvent, endOfDay(now)) &&
+                currentTime > startEventTime:
+                return Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    (elapsedTimeSinceEventStart /
+                      (endOfDay(now).getTime() - startEventTime)) *
+                      100
+                  )
+                );
+              case isCurrentDateToday &&
+                isBefore(startEvent, startOfDay(now)) &&
+                isAfter(endEvent, endOfDay(now)):
+                return Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    ((currentTime - startOfDay(now).getTime()) /
+                      (endOfDay(now).getTime() - startOfDay(now).getTime())) *
+                      100
+                  )
+                );
+              case isCurrentDateToday &&
+                currentTime > startEventTime &&
+                currentTime < endEventTime:
+                return Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    (elapsedTimeSinceEventStart /
+                      (endEventTime - startEventTime)) *
+                      100
+                  )
+                );
+              case isCurrentDateToday && endEventTime < currentTime:
+                return 100;
+              case isCurrentDateToday && startEventTime > currentTime:
+                return 0;
+              case isBefore(currentDate, now):
+                return 100;
+              default:
+                return 0;
+            }
+          };
+
+          const gradientBackground = () => {
+            return `linear-gradient(#9ca3af ${calculateGradientPercentage()}%, ${getEventColor(
+              event.type
+            )} ${calculateGradientPercentage()}%)`;
+          };
+
+          return (
+            <div
+              key={`${event.id}-${eventIndex}`}
+              className="absolute border shadow-md border-white rounded-md overflow-hidden cursor-pointer transition-all duration-200"
+              style={{
+                left: 0,
+                width: `${getEventContainerDynamicWidth(eventStackIndex)}%`,
+                top: `${topPosition}%`,
+                height: `${containerHeight}%`,
+                background: gradientBackground(),
+                transform: `translateZ(${eventStackIndex * 2}px)`,
+                zIndex:
+                  event.id === passedEvent?.id
+                    ? CLICKED_EVENT_ON_TOP_INDEX
+                    : eventStackIndex + 1,
               }}
-            />
-          </div>
-        );
-      })}
-    </div>
+            >
+              <EventHolder
+                event={event}
+                onClick={(clickEvent) => {
+                  clickEvent.stopPropagation();
+                  onEventClick(event);
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    )
   );
 };
 
@@ -142,7 +223,7 @@ const getEventContainerDynamicWidth = (eventStackIndex: number) => {
   // all numbers below are percentages
   const minimumWidth = 40;
   const baseWidth = 95;
-  const widthReduction = 20;
+  const widthReduction = 10;
   return Math.max(baseWidth - eventStackIndex * widthReduction, minimumWidth);
 };
 
@@ -167,7 +248,7 @@ interface EventHolderProps {
 const EventHolder = ({ event, onClick }: EventHolderProps) => {
   return (
     <div
-      className="h-full w-full px-1 cursor-pointer hover:bg-gray-400/35"
+      className="h-full w-full px-1 cursor-pointer hover:bg-black/10"
       onClick={onClick}
     >
       <div className="flex items-center text-xs">

@@ -4,7 +4,7 @@ const TimeIndicator = () => {
   const positionOffset = usePositionOffset();
   return (
     <div
-      className="absolute w-full overflow-hidden z-30 flex flex-row items-center"
+      className="absolute w-full overflow-hidden z-40 flex flex-row items-center"
       style={{
         // position the element higher up to compensate for the rounded indicator piece pushing the whole element lower
         top: `${positionOffset - 0.5}%`,
