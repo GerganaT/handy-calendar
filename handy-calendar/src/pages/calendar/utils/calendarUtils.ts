@@ -207,7 +207,8 @@ export const getTimePositionOffset = (date: Date) =>
   (date.getHours() + date.getMinutes() / MINUTES_IN_AN_HOUR) *
   (100 / FULL_DAY_NIGHT_HOURS);
 
-export const getCalendarEntryEvents = (events: IntervalTree<EventUiState>, calendarEntry: CalendarEntryUiState) => events?.search([
+export const getCalendarEntryEvents = 
+(events: IntervalTree<EventUiState>, calendarEntry: CalendarEntryUiState) => events?.search([
               startOfDay(getDateFromCalendarEntry(calendarEntry)).getTime(),
               endOfDay(getDateFromCalendarEntry(calendarEntry)).getTime(),
             ])  

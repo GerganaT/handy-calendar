@@ -33,7 +33,12 @@ export const getEvents = () => {
         const storedEvent = apiClient.getItem(apiClient.key(index) ?? `${EVENT_DEFAULT_ID}`);
         if(storedEvent){
             const parsedEvent = JSON.parse(storedEvent) as EventApiState
-            storedEvents.insert( [  new Date(parsedEvent.startEvent).getTime(), new Date( parsedEvent.endEvent).getTime()],{...parsedEvent, startEvent: new Date(parsedEvent.startEvent), endEvent: new Date(parsedEvent.endEvent)});
+            storedEvents.insert( [  new Date(parsedEvent.startEvent).getTime(),
+                 new Date( parsedEvent.endEvent).getTime()],
+                 {...parsedEvent,
+                     startEvent: new Date(parsedEvent.startEvent),
+                     endEvent: new Date(parsedEvent.endEvent),
+                    });
         }
     }
     return storedEvents;
