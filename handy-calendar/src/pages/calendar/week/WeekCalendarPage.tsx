@@ -7,11 +7,12 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
-import { isSameDay, isWithinInterval, startOfDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import {
   formatHourInTwelveHourFormat,
   FULL_DAY_NIGHT_HOURS,
+  getCalendarEntryEvents,
   getDateFromCalendarEntry,
   getWeekDates,
   WEEK_DAYS_COUNT,
@@ -29,20 +30,12 @@ const WeekCalendarPage = () => {
   const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
     let weekDates = getWeekDates(currentDate);
-    if (events && events.length > 0) {
+    if (events && events.size > 0) {
       weekDates = weekDates.map(
         (entry) =>
           ({
             ...entry,
-            events: events?.filter((event) => {
-              return isWithinInterval(
-                startOfDay(getDateFromCalendarEntry(entry)),
-                {
-                  start: startOfDay(event.startEvent),
-                  end: startOfDay(event.endEvent),
-                }
-              );
-            }),
+            events: getCalendarEntryEvents(events, entry),
           } as CalendarEntryUiState)
       );
     }
@@ -65,7 +58,7 @@ const WeekCalendarPage = () => {
           <div className="w-full h-full">
             <WeekDatesHeader weekDates={totalDaysWithEvents} />
             <WeekdaysAgenda
-              eventsLength={events?.length}
+              eventsLength={events?.size}
               weekCalendarEntries={totalDaysWithEvents}
               shouldShowLoadingSkeleton={shouldShowLoadingSkeleton}
             />

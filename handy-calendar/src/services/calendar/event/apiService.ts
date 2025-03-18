@@ -1,4 +1,5 @@
 import EventApiState from "@/types/calendar/event/EventApiState";
+import IntervalTree from '@flatten-js/interval-tree';
 import apiClient from "./apiClient";
 import { EVENT_DEFAULT_ID } from "./constants";
 
@@ -27,12 +28,12 @@ export const getEvent = (eventId: number) => {
 };
 
 export const getEvents = () => {
-    const storedEvents: EventApiState[] = [];
+    const storedEvents = new IntervalTree<EventApiState>();
     for (let index = 0; index < apiClient.length; index++) {
         const storedEvent = apiClient.getItem(apiClient.key(index) ?? `${EVENT_DEFAULT_ID}`);
         if(storedEvent){
             const parsedEvent = JSON.parse(storedEvent) as EventApiState
-            storedEvents.push({...parsedEvent, startEvent: new Date(parsedEvent.startEvent), endEvent: new Date(parsedEvent.endEvent)});
+            storedEvents.insert( [  new Date(parsedEvent.startEvent).getTime(), new Date( parsedEvent.endEvent).getTime()],{...parsedEvent, startEvent: new Date(parsedEvent.startEvent), endEvent: new Date(parsedEvent.endEvent)});
         }
     }
     return storedEvents;

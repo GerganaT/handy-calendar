@@ -1,4 +1,4 @@
-import usePositionOffset from "@/hooks/use-position-offset";
+import useTimePositionOffset from "@/hooks/use-position-offset";
 import {
   getDateFromCalendarEntry,
   getTimePositionOffset,
@@ -29,29 +29,14 @@ const DailyEvents = ({
   passedEvent,
   onEventClick,
 }: DailyEventsProps) => {
-  const positionOffset = usePositionOffset();
+  const timePositionOffset = useTimePositionOffset();
 
   const currentDate = startOfDay(getDateFromCalendarEntry(calendarEntry));
 
-  const stackedEvents = [...calendarEntry.events].sort(
-    (previousEvent, nextEvent) => {
-      if (previousEvent.id === passedEvent?.id) return 1;
-      if (nextEvent.id === passedEvent?.id) return -1;
-      return (
-        previousEvent.startEvent.getTime() - nextEvent.startEvent.getTime()
-      );
-    }
-  );
-
   return (
-    positionOffset && (
+    timePositionOffset && (
       <div className="relative h-full">
-        {stackedEvents.map((event, eventIndex) => {
-          const eventStackIndex = getEventStackIndex(
-            event,
-            calendarEntry.events
-          );
-
+        {calendarEntry.events.map((event, eventIndex) => {
           const { topPosition, containerHeight } = calculateEventPosition(
             currentDate,
             startOfDay(event.startEvent),
@@ -69,6 +54,7 @@ const DailyEvents = ({
             const elapsedTimeSinceEventStart = currentTime - startEventTime;
             const isCurrentDateToday = isToday(currentDate);
 
+            // 100 and 0 are percentages
             switch (true) {
               case isCurrentDateToday &&
                 isBefore(startEvent, startOfDay(now)) &&
@@ -142,15 +128,14 @@ const DailyEvents = ({
               className="absolute border shadow-md border-white rounded-md overflow-hidden cursor-pointer transition-all duration-200"
               style={{
                 left: 0,
-                width: `${getEventContainerDynamicWidth(eventStackIndex)}%`,
+                width: `${getEventContainerDynamicWidth(eventIndex)}%`,
                 top: `${topPosition}%`,
                 height: `${containerHeight}%`,
                 background: gradientBackground(),
-                transform: `translateZ(${eventStackIndex * 2}px)`,
                 zIndex:
                   event.id === passedEvent?.id
                     ? CLICKED_EVENT_ON_TOP_INDEX
-                    : eventStackIndex + 1,
+                    : eventIndex + 1,
               }}
             >
               <EventHolder
@@ -169,18 +154,6 @@ const DailyEvents = ({
 };
 
 export default DailyEvents;
-
-const getEventStackIndex = (
-  event: EventUiState,
-  allEvents: EventUiState[]
-): number => {
-  const overlappingEvents = [...allEvents].sort(
-    (previousEvent, nextEvent) =>
-      previousEvent.startEvent.getTime() - nextEvent.startEvent.getTime()
-  );
-
-  return overlappingEvents.indexOf(event);
-};
 
 const calculateEventPosition = (
   currentDate: Date,

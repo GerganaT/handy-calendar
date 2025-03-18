@@ -1,5 +1,6 @@
 import EventApiState from "@/types/calendar/event/EventApiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
+import IntervalTree from "@flatten-js/interval-tree";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteEvent, getEvent, getEvents, saveEvent } from "./apiService";
 import { EVENTS_DATA_KEY } from "./constants";
@@ -33,7 +34,7 @@ export const useGetEvent = (eventId: number) =>
   });
 
 export const useGetEvents = () =>
-  useQuery<EventApiState[], Error, EventUiState[]>({
+  useQuery<IntervalTree<EventApiState>, Error, IntervalTree<EventUiState>>({
     queryKey: EVENTS_DATA_KEY,
     queryFn: () => getEvents(),
   });

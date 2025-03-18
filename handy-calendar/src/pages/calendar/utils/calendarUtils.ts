@@ -1,5 +1,7 @@
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
-import { format, parse } from "date-fns";
+import EventUiState from "@/types/calendar/event/EventUiState";
+import IntervalTree from "@flatten-js/interval-tree";
+import { endOfDay, format, parse, startOfDay } from "date-fns";
 
 export const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const WEEK_DAYS_COUNT = 7;
@@ -204,3 +206,8 @@ export function getDateFromCalendarEntry ({date, year,month}: CalendarEntryUiSta
 export const getTimePositionOffset = (date: Date) =>
   (date.getHours() + date.getMinutes() / MINUTES_IN_AN_HOUR) *
   (100 / FULL_DAY_NIGHT_HOURS);
+
+export const getCalendarEntryEvents = (events: IntervalTree<EventUiState>, calendarEntry: CalendarEntryUiState) => events?.search([
+              startOfDay(getDateFromCalendarEntry(calendarEntry)).getTime(),
+              endOfDay(getDateFromCalendarEntry(calendarEntry)).getTime(),
+            ])  
