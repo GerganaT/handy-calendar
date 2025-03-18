@@ -7,13 +7,13 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
-import { isToday, isWithinInterval, startOfDay } from "date-fns";
+import { isToday } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import {
   formatHourInTwelveHourFormat,
   FULL_DAY_NIGHT_HOURS,
+  getCalendarEntryEvents,
   getDateDetails,
-  getDateFromCalendarEntry,
 } from "../utils/calendarUtils";
 import { useTriggerLoadingSkeleton } from "../utils/helperHooks";
 
@@ -29,25 +29,17 @@ const DayCalendarPage = () => {
   const currentDateWithEvents = useMemo(() => {
     showLoadingSkeleton();
     let dateDetails = getDateDetails(currentDate);
-    if (events && events.length > 0) {
+    if (events && events.size > 0) {
       dateDetails = {
         ...dateDetails,
-        events: events?.filter((event) => {
-          return isWithinInterval(
-            startOfDay(getDateFromCalendarEntry(dateDetails)),
-            {
-              start: startOfDay(event.startEvent),
-              end: startOfDay(event.endEvent),
-            }
-          );
-        }),
+        events: getCalendarEntryEvents(events, dateDetails),
       } as CalendarEntryUiState;
     }
 
     return dateDetails;
   }, [currentDate, events]);
 
-  const timeIndicatorKey = `${events?.length}-${
+  const timeIndicatorKey = `${events?.size}-${
     clickedEvent ? `event-${clickedEvent.id}` : "no-event"
   }`;
 

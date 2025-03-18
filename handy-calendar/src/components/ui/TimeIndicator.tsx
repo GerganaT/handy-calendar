@@ -1,7 +1,7 @@
-import usePositionOffset from "@/hooks/use-position-offset";
+import useTimePositionOffset from "@/hooks/use-position-offset";
 
 const TimeIndicator = () => {
-  const positionOffset = usePositionOffset();
+  const positionOffset = useTimePositionOffset();
   return (
     <div
       className="absolute w-full overflow-hidden z-40 flex flex-row items-center"

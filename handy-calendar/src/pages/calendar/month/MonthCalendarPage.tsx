@@ -6,18 +6,14 @@ import { useCalendarNavigationStore } from "@/navigation/store/calendarNavigatio
 import { useGetEvents } from "@/services/calendar/event/eventService";
 import CalendarEntryUiState from "@/types/calendar/CalendarEntryUiState";
 import EventUiState from "@/types/calendar/event/EventUiState";
-import {
-  differenceInDays,
-  isSameDay,
-  isToday,
-  isWithinInterval,
-  startOfDay,
-} from "date-fns";
+import IntervalTree from "@flatten-js/interval-tree";
+import { differenceInDays, isSameDay, isToday } from "date-fns";
 import { useMemo, useState } from "react";
 import {
   FIRST_DAY_OF_THE_MONTH,
+  getCalendarEntryEvents,
   getDateFromCalendarEntry,
-  getMonthDates,
+  getMonthDates as getMonthlyEntries,
   WEEK_DAYS,
   WEEK_DAYS_COUNT,
 } from "../utils/calendarUtils";
@@ -33,63 +29,18 @@ const MonthCalendarPage = () => {
     useTriggerLoadingSkeleton();
   const { data: events, error } = useGetEvents();
 
-  const multiDayEventsPositionIndices = useMemo(() => {
-    if (!events) return new Map<number, number>();
-
-    const positions = new Map<number, number>();
-    const multiDayEvents = events
-      .filter((event) => differenceInDays(event.endEvent, event.startEvent) > 0)
-      .sort(
-        (firstEvent, secondEvent) =>
-          firstEvent.startEvent.getTime() - secondEvent.startEvent.getTime()
-      );
-
-    let currentPosition = 0;
-    multiDayEvents.forEach((event) => {
-      positions.set(event.id, currentPosition++);
-    });
-
-    return positions;
-  }, [events]);
-
   const totalDaysWithEvents = useMemo(() => {
     showLoadingSkeleton();
-    let daysWithEvents = getMonthDates(currentDate);
-    if (events && events.length > 0) {
-      daysWithEvents = daysWithEvents.map((entry) => {
-        const currentDate = getDateFromCalendarEntry(entry);
-        const dayEvents = events?.filter((event) => {
-          return isWithinInterval(startOfDay(currentDate), {
-            start: startOfDay(event.startEvent),
-            end: startOfDay(event.endEvent),
-          });
-        });
-
-        const multiDayEvents = dayEvents
-          .filter(
-            (event) => differenceInDays(event.endEvent, event.startEvent) > 0
-          )
-          .sort(
-            (firstEvent, secondEvent) =>
-              firstEvent.startEvent.getTime() - secondEvent.startEvent.getTime()
-          );
-
-        const singleDayEvents = dayEvents
-          .filter(
-            (event) => differenceInDays(event.endEvent, event.startEvent) === 0
-          )
-          .sort(
-            (firstEvent, secondEvent) =>
-              firstEvent.startEvent.getTime() - secondEvent.startEvent.getTime()
-          );
-
+    let monthlyEntries = getMonthlyEntries(currentDate);
+    if (events && events.size > 0) {
+      monthlyEntries = monthlyEntries.map((entry) => {
         return {
           ...entry,
-          events: [...multiDayEvents, ...singleDayEvents],
+          events: getCalendarEntryEvents(events, entry),
         } as CalendarEntryUiState;
       });
     }
-    return daysWithEvents;
+    return monthlyEntries;
   }, [currentDate, events]);
 
   return (
@@ -106,14 +57,14 @@ const MonthCalendarPage = () => {
               ))
             : totalDaysWithEvents.length > 0 &&
               totalDaysWithEvents.map((calendarEntry, index) => (
-                <CalendarEntryElement
+                <CalendarEntry
                   entry={calendarEntry}
                   cellIndex={index}
                   key={index}
                   provideEvent={(eventEntry) =>
                     setSelectedEvent({ ...eventEntry })
                   }
-                  eventPositions={multiDayEventsPositionIndices}
+                  events={events}
                 />
               ))}
         </div>
@@ -133,15 +84,30 @@ interface CalendarEntryProps {
   entry: CalendarEntryUiState;
   cellIndex: number;
   provideEvent: (eventEntry: EventUiState) => void;
-  eventPositions: Map<number, number>;
+  events: IntervalTree<EventUiState> | undefined;
 }
 
-const CalendarEntryElement = ({
+const CalendarEntry = ({
   entry,
   cellIndex,
   provideEvent,
-  eventPositions,
+  events,
 }: CalendarEntryProps) => {
+  const multiDayEventsPositionIndices = useMemo(() => {
+    if (!events) return new Map<number, number>();
+
+    const positions = new Map<number, number>();
+    const multiDayEvents = events.values.filter(
+      (event) => differenceInDays(event.endEvent, event.startEvent) > 0
+    );
+
+    multiDayEvents.forEach((event, eventIndex) => {
+      positions.set(event.id, eventIndex++);
+    });
+
+    return positions;
+  }, [events]);
+
   const currentDate = getDateFromCalendarEntry(entry);
 
   const multiDayEvents = entry.events.filter(
@@ -170,7 +136,8 @@ const CalendarEntryElement = ({
         {multiDayEvents.map((eventEntry) => {
           const isFirstDay = isSameDay(currentDate, eventEntry.startEvent);
           const isLastDay = isSameDay(currentDate, eventEntry.endEvent);
-          const eventIndex = eventPositions.get(eventEntry.id) || 0;
+          const eventIndex =
+            multiDayEventsPositionIndices.get(eventEntry.id) || 0;
 
           return (
             <EventHolder
