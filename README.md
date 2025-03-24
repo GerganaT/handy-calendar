@@ -1,7 +1,7 @@
-This project is a practice assignment, aiming to excercise different topics such as: 
- 1) state management
- 2) code structure and API handler organization
- 3) managing a lot of complexity with the bigger task
-
-The finished product should resemble some of the features and look of the Google calendar Web app.
-Current status: WiP.
+Calendar, partially inspired by Google Calendar Web app's features.
+I made this project to explore how different aspects of web development with TypeScript and React come together such as:
+1. State management
+2. UI/UX design principles
+3. Working with date/time logic
+4. Architectural design
+5. Page navigation
